@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta name="google-site-verification" content="ffUsY4wHfPUKgGSKGT2kXW5-v7i9mK92b82mXq1KQtg" />
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>HealthLens AI - Comprehensive Clinical Diagnostic Suite</title>
@@ -215,7 +214,7 @@
       font-size: 0.75rem;
     }
 
-    /* Main Area */
+    /* Main Workspace */
     .main-wrapper {
       flex: 1;
       display: flex;
@@ -228,19 +227,27 @@
       background: rgba(15, 23, 42, 0.85);
       backdrop-filter: blur(12px);
       border-bottom: 1px solid var(--card-border);
-      padding: 0.8rem 1.5rem;
+      padding: 0.75rem 1.5rem;
       display: flex;
       justify-content: space-between;
       align-items: center;
       position: sticky;
       top: 0;
       z-index: 50;
+      gap: 0.75rem;
     }
 
     .header-left {
       display: flex;
       align-items: center;
       gap: 0.85rem;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      flex-wrap: wrap;
     }
 
     .brand {
@@ -358,6 +365,7 @@
 
     @media (max-width: 640px) {
       .grid-2 { grid-template-columns: 1fr; }
+      .header-right { gap: 0.4rem; }
     }
 
     .btn {
@@ -402,13 +410,21 @@
       font-weight: 800;
     }
 
+    .btn-create-acct {
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: #fff;
+      box-shadow: 0 4px 15px rgba(16, 185, 129, 0.35);
+    }
+    .btn-create-acct:hover {
+      box-shadow: 0 6px 20px rgba(16, 185, 129, 0.5);
+    }
+
     .btn-stop {
       background: rgba(239, 68, 68, 0.2);
       border: 1px solid #ef4444;
       color: #ef4444;
       font-weight: 700;
     }
-
     .btn-stop:hover {
       background: #ef4444;
       color: #fff;
@@ -632,7 +648,7 @@
       </div>
 
       <div class="sidebar-footer">
-        <div class="user-pill" onclick="openAuthModal()">
+        <div class="user-pill" onclick="openAuthModal(false)">
           <div class="user-avatar" id="userAvatar">?</div>
           <div>
             <div style="font-weight: 700;" id="userLabel">Guest Mode</div>
@@ -652,9 +668,23 @@
             <span id="brandIcon">🛡️</span> <span id="brandText">HealthLens AI</span>
           </div>
         </div>
-        <span class="status-badge" id="modelBadge">
-          <span>●</span> gemini-3.6-flash Active
-        </span>
+
+        <div class="header-right">
+          <!-- App Download / Install Button -->
+          <button type="button" class="btn btn-secondary" id="installAppBtn" onclick="installPWA()" style="padding: 0.4rem 0.75rem; font-size: 0.8rem;" title="Download & Install HealthLens App">
+            📱 Download App
+          </button>
+
+          <!-- Create Account Button -->
+          <button type="button" class="btn btn-create-acct" id="headerCreateAccountBtn" onclick="openAuthModal(true)" style="padding: 0.4rem 0.85rem; font-size: 0.8rem;">
+            ✨ Create Account
+          </button>
+
+          <!-- Active AI Model Badge -->
+          <span class="status-badge" id="modelBadge">
+            <span>●</span> gemini-3.6-flash Active
+          </span>
+        </div>
       </header>
 
       <main class="container">
@@ -941,11 +971,12 @@
     </div>
   </div>
 
-  <!-- Modal: Authentication -->
+  <!-- Modal: Authentication (Sign In / Sign Up) -->
   <div class="modal-backdrop" id="authModal">
     <div class="modal-box">
       <h3 id="modalTitle" style="color: var(--primary); margin-bottom: 0.4rem;">Sign In to HealthLens</h3>
-      <p style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 1.2rem;">Sync your clinical records & chats across devices.</p>
+      <p id="modalSub" style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 1.2rem;">Sync your clinical records & chats across devices.</p>
+      
       <form onsubmit="handleAuthSubmit(event)">
         <div class="form-group">
           <label>Email</label>
@@ -960,6 +991,11 @@
           <button type="button" class="btn btn-secondary" onclick="closeAuthModal()">Cancel</button>
         </div>
       </form>
+
+      <div style="text-align: center; margin-top: 1rem; font-size: 0.8rem;">
+        <span id="authToggleText">Need an account?</span>
+        <a href="javascript:void(0)" onclick="toggleAuthMode()" id="authToggleLink" style="color: var(--primary); font-weight: bold; margin-left: 4px;">Sign Up</a>
+      </div>
     </div>
   </div>
 
@@ -971,8 +1007,10 @@
     let currentSessionId = null;
     let chatHistory = [];
     let isIncognito = false;
+    let isSignUp = false;
     let chatAbortController = null;
     let currentHandoverData = null;
+    let deferredPrompt = null;
 
     // Body Map State
     let selectedZone = null;
@@ -988,6 +1026,28 @@
       loadHistory();
       initBodyMapInteractions();
     });
+
+    // PWA Install / App Download handler
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      const btn = document.getElementById('installAppBtn');
+      if (btn) btn.style.display = 'inline-flex';
+    });
+
+    function installPWA() {
+      if (deferredPrompt) {
+        deferredPrompt.prompt();
+        deferredPrompt.userChoice.then((choiceResult) => {
+          if (choiceResult.outcome === 'accepted') {
+            console.log('App installation accepted');
+          }
+          deferredPrompt = null;
+        });
+      } else {
+        alert("To install HealthLens AI as an App:\n\n• On Chrome/Edge (Desktop): Click the install icon (🖥️ or ➕) in the address bar.\n• On Android: Tap Chrome menu (⋮) -> 'Install App' or 'Add to Home screen'.\n• On iOS/Safari: Tap the 'Share' icon (⎋) -> scroll down and select 'Add to Home Screen'.");
+      }
+    }
 
     function toggleSidebar() {
       document.getElementById('sidebar').classList.toggle('open');
@@ -1008,7 +1068,6 @@
       const origMaxH = el.style.maxHeight;
 
       try {
-        // Expand element fully so scrollable contents are visible in the capture
         el.style.height = "auto";
         el.style.maxHeight = "none";
         el.style.overflow = "visible";
@@ -1047,7 +1106,6 @@
         console.error("PDF Export Error:", err);
         alert("PDF Generation Failed: " + err.message);
       } finally {
-        // Restore styles
         el.style.height = origHeight;
         el.style.maxHeight = origMaxH;
         el.style.overflow = "auto";
@@ -1923,39 +1981,63 @@
     }
 
     // -------------------------------------------------------------
-    // Auth Handlers
+    // Auth Handlers (Sign In & Create Account Mode)
     // -------------------------------------------------------------
     function updateUserUI() {
       const avatar = document.getElementById('userAvatar');
       const label = document.getElementById('userLabel');
       const sub = document.getElementById('userSub');
       const btn = document.getElementById('authActionBtn');
+      const createAcctBtn = document.getElementById('headerCreateAccountBtn');
 
       if (currentUser) {
         avatar.innerText = currentUser.email.charAt(0).toUpperCase();
         label.innerText = currentUser.email.split('@')[0];
         sub.innerText = "Synced Account";
         btn.innerText = "🚪";
+        if (createAcctBtn) createAcctBtn.style.display = 'none';
       } else {
         avatar.innerText = "?";
         label.innerText = "Guest Mode";
         sub.innerText = "Click to Sign In";
         btn.innerText = "🔑";
+        if (createAcctBtn) createAcctBtn.style.display = 'inline-flex';
       }
     }
 
-    function openAuthModal() { document.getElementById('authModal').style.display = 'flex'; }
-    function closeAuthModal() { document.getElementById('authModal').style.display = 'none'; }
+    function openAuthModal(startWithSignUp = false) {
+      isSignUp = startWithSignUp;
+      updateAuthModalText();
+      document.getElementById('authModal').style.display = 'flex';
+    }
+
+    function closeAuthModal() {
+      document.getElementById('authModal').style.display = 'none';
+    }
+
+    function toggleAuthMode() {
+      isSignUp = !isSignUp;
+      updateAuthModalText();
+    }
+
+    function updateAuthModalText() {
+      document.getElementById('modalTitle').innerText = isSignUp ? "Create a HealthLens Account" : "Sign In to HealthLens";
+      document.getElementById('modalSub').innerText = isSignUp ? "Register to save and sync clinical records across devices." : "Sync your clinical records & chats across devices.";
+      document.getElementById('authSubmitBtn').innerText = isSignUp ? "Create Account" : "Login";
+      document.getElementById('authToggleText').innerText = isSignUp ? "Already have an account?" : "Need an account?";
+      document.getElementById('authToggleLink').innerText = isSignUp ? "Sign In" : "Sign Up";
+    }
+
     function handleAuthAction() {
       if (currentUser) {
-        if (confirm("Sign out?")) {
+        if (confirm("Sign out of your account?")) {
           localStorage.removeItem('healthlens_user');
           currentUser = null;
           updateUserUI();
           loadHistory();
         }
       } else {
-        openAuthModal();
+        openAuthModal(false);
       }
     }
 
@@ -1963,14 +2045,17 @@
       e.preventDefault();
       const email = document.getElementById('authEmail').value.trim();
       const password = document.getElementById('authPassword').value;
+      const endpoint = isSignUp ? '/api/auth/signup' : '/api/auth/login';
+
       try {
-        const res = await fetch('/api/auth/login', {
+        const res = await fetch(endpoint, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email, password })
         });
         const json = await res.json();
-        if (!res.ok) throw new Error(json.detail || "Login failed");
+        if (!res.ok) throw new Error(json.detail || "Authentication failed");
+
         currentUser = { email };
         localStorage.setItem('healthlens_user', JSON.stringify(currentUser));
         updateUserUI();
