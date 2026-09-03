@@ -1,0 +1,284 @@
+{
+  "a43461799@gmail.com": {
+    "password_hash": "656769324ab8216b60f95ceee3d8333521f2dd9b15393085c217a22931e69261",
+    "sessions": [
+      {
+        "id": "e23e46c6",
+        "title": "Migraine Headache",
+        "type": "symptoms",
+        "data": {
+          "suspected_primary_condition": "Migraine Headache",
+          "triage_urgency": "Urgent Care",
+          "clinical_summary": "A 26-year-old male reports a persistent, strictly unilateral headache lasting for one month without prior reported medical history. A prompt clinical evaluation is required to characterize the headache type and rule out any underlying structural or vascular causes.",
+          "differential_diagnoses": [
+            {
+              "disease_name": "Migraine Headache",
+              "likelihood": "High",
+              "matching_reasons": "Unilateral location and typical onset in young adults."
+            },
+            {
+              "disease_name": "Cluster Headache",
+              "likelihood": "Moderate",
+              "matching_reasons": "Strictly one-sided headache pattern occurring over a distinct timeframe of weeks to months."
+            },
+            {
+              "disease_name": "Secondary Headache (e.g., intracranial lesion or vascular etiology)",
+              "likelihood": "Low",
+              "matching_reasons": "Persistent unilateral headache lasting a month warrants ruling out secondary structural causes."
+            }
+          ],
+          "red_flag_symptoms": [
+            "Sudden 'thunderclap' maximum intensity headache",
+            "Focal neurological deficits such as numbness, weakness, or vision changes",
+            "Fever, night sweats, or unexplained weight loss",
+            "Headache that worsens with coughing, sneezing, or position changes",
+            "Confusion, memory loss, or altered mental status"
+          ],
+          "recommended_diagnostic_tests": [
+            "Comprehensive neurological examination",
+            "Magnetic Resonance Imaging (MRI) of the brain",
+            "Computed Tomography (CT) scan of the head (if MRI is unavailable or acutely indicated)"
+          ],
+          "questions_for_doctor": [
+            "Does the location and pattern of my headache point to a specific primary headache disorder like migraine?",
+            "Do I need neuroimaging (such as an MRI) to rule out secondary causes?",
+            "What acute and preventive medication options are recommended for my condition?"
+          ],
+          "disclaimer": "AI triage assistant only. Not a definitive diagnosis."
+        },
+        "created_at": "Sep 03, 22:07",
+        "updated_at": "2026-09-03 22:08"
+      },
+      {
+        "id": "2ef0ffeb",
+        "title": "Acute Abdominal Pain (e.g., Renal Colic or Visceral Spasm)",
+        "type": "symptoms",
+        "data": {
+          "suspected_primary_condition": "Acute Abdominal Pain (e.g., Renal Colic or Visceral Spasm)",
+          "triage_urgency": "Urgent Care",
+          "clinical_summary": "A 26-year-old male presents with sudden-onset sharp abdominal pain lasting 20 minutes without prior medical history. Prompt clinical evaluation is warranted to rule out acute surgical, urological, or gastrointestinal etiologies.",
+          "differential_diagnoses": [
+            {
+              "disease_name": "Renal Colic (Nephrolithiasis)",
+              "likelihood": "High",
+              "matching_reasons": "Sudden onset of severe, sharp abdominal or flank pain in a young adult."
+            },
+            {
+              "disease_name": "Acute Intestinal Spasm / Gastroenteritis",
+              "likelihood": "Moderate",
+              "matching_reasons": "Acute onset of sharp, episodic abdominal cramping."
+            },
+            {
+              "disease_name": "Acute Appendicitis",
+              "likelihood": "Moderate",
+              "matching_reasons": "Can present with sudden focal abdominal discomfort, though usually evolves over several hours."
+            },
+            {
+              "disease_name": "Testicular Torsion (Referred Pain)",
+              "likelihood": "Low",
+              "matching_reasons": "May present as sudden lower abdominal pain in young males."
+            }
+          ],
+          "red_flag_symptoms": [
+            "High fever or chills",
+            "Persistent vomiting or inability to keep fluids down",
+            "Radiating pain to the groin, scrotum, or lower back",
+            "Blood in urine or stool",
+            "Lightheadedness, dizziness, or fainting",
+            "Rigid, hard, or severely tender abdomen"
+          ],
+          "recommended_diagnostic_tests": [
+            "Urinalysis",
+            "Complete Blood Count (CBC) and Basic Metabolic Panel (BMP)",
+            "Abdominal and Pelvic Ultrasound",
+            "Non-contrast CT Scan of Abdomen and Pelvis"
+          ],
+          "questions_for_doctor": [
+            "Does the pain travel to your back, side, or groin area?",
+            "Is the pain constant, or does it come and go in intense waves?",
+            "Have you noticed any nausea, fever, or changes when urinating?"
+          ],
+          "disclaimer": "AI triage assistant only. Not a definitive diagnosis."
+        },
+        "created_at": "Sep 03, 22:10",
+        "updated_at": "2026-09-03 22:10"
+      },
+      {
+        "id": "b2da9562",
+        "title": "Acute Cervical Radiculopathy vs. Cervical Artery Dissection",
+        "type": "symptoms",
+        "data": {
+          "suspected_primary_condition": "Acute Cervical Radiculopathy vs. Cervical Artery Dissection",
+          "triage_urgency": "Emergency",
+          "clinical_summary": "A 25-year-old male presents with acute, maximum-intensity (10/10) sharp and stabbing cervical neck pain. Given the extreme severity, immediate emergency evaluation is required to rule out acute neurovascular conditions such as vertebral artery dissection, subarachnoid hemorrhage, or severe cervical cord/nerve root compression.",
+          "dual_doctor_debate": {
+            "active": true,
+            "dr_alpha_internist": {
+              "perspective": "Holistic & Conservative Internal Medicine",
+              "evaluation": "The patient is young with no prior medical history. A sudden 10/10 pain could represent severe cervical radiculopathy secondary to an acute disc herniation or severe acute facet joint dysfunction with muscle spasm. However, the extreme severity demands cautious immediate evaluation.",
+              "suggested_approach": "Obtain baseline neurological exam, order targeted cervical MRI, and manage acute pain while monitoring for sensory or motor deficits."
+            },
+            "dr_beta_emergency": {
+              "perspective": "Acute Care & Critical Life-Threat Rule-Out",
+              "evaluation": "A 10/10 sharp neck pain in a young adult is a critical presentation. We must immediately rule out life-threatening conditions such as Vertebral Artery Dissection (VAD), Subarachnoid Hemorrhage (SAH) presenting with meningismus, or spinal epidural abscess.",
+              "worst_case_rule_out": "Vertebral Artery Dissection or Subarachnoid Hemorrhage.",
+              "consensus_resolution": "Proceed immediately to the Emergency Department for stat non-contrast CT/CTA of the head and neck, formal neurological evaluation, and acute pain stabilization."
+            }
+          },
+          "differential_diagnoses": [
+            {
+              "disease_name": "Acute Cervical Disc Herniated / Radiculopathy",
+              "likelihood": "High",
+              "matching_reasons": "Severe sharp/stabbing localized neck pain, common in young adults under sudden axial strain."
+            },
+            {
+              "disease_name": "Cervical Artery Dissection (Vertebral or Carotid)",
+              "likelihood": "Moderate",
+              "matching_reasons": "Sudden onset of severe 10/10 unilateral or localized cervical pain, often occurring in young patients without prior history."
+            },
+            {
+              "disease_name": "Subarachnoid Hemorrhage / Meningitis",
+              "likelihood": "Moderate",
+              "matching_reasons": "Extreme neck pain and potential nuchal rigidity."
+            },
+            {
+              "disease_name": "Acute Cervical Facet Joint Syndrome",
+              "likelihood": "Low",
+              "matching_reasons": "Sharp localized neck pain, though 10/10 severity typically indicates nerve root or vascular involvement."
+            }
+          ],
+          "red_flag_symptoms": [
+            "Sudden 'thunderclap' onset headache",
+            "Fever, chills, or neck stiffness (meningismus)",
+            "Numbness, tingling, or weakness in upper extremities",
+            "Difficulty swallowing or speaking",
+            "Loss of bowel or bladder control"
+          ],
+          "recommended_diagnostic_tests": [
+            "CT Angiography (CTA) of Neck and Head",
+            "Magnetic Resonance Imaging (MRI) of Cervical Spine",
+            "Full Neurological Examination",
+            "Basic Metabolic Panel and Inflammatory Markers (ESR/CRP)"
+          ],
+          "paramedic_handover": {
+            "chief_complaint": "Acute 10/10 sharp, stabbing cervical neck pain.",
+            "mechanism_or_triggers": "Unspecified onset; no prior reported medical history.",
+            "signs_and_symptoms": "Severe localized neck pain, high pain distress.",
+            "red_flag_warnings": "High risk for cervical artery dissection, acute radiculopathy, or central nervous system pathology.",
+            "immediate_suggested_interventions": "Maintain cervical spine alignment, monitor vital signs closely, establish IV access, and transport urgently to nearest Emergency Department."
+          },
+          "disclaimer": "AI clinical triage tool only. Not a substitute for professional board-certified evaluation."
+        },
+        "created_at": "Sep 03, 23:13",
+        "updated_at": "2026-09-03 23:13"
+      },
+      {
+        "id": "34575515",
+        "title": "Acute Severe Cervical Muscle Spasm (Torticollis) vs. Cervical Artery Dissection",
+        "type": "symptoms",
+        "data": {
+          "suspected_primary_condition": "Acute Severe Cervical Muscle Spasm (Torticollis) vs. Cervical Artery Dissection",
+          "triage_urgency": "Emergency",
+          "clinical_summary": "A 25-year-old male presents with extremely severe (10/10) colicky/cramping neck pain. Although intense muscle spasms or acute torticollis frequently cause severe localized cramping in young adults, a maximum pain rating (10/10) requires immediate emergency evaluation to exclude catastrophic vascular causes such as carotid or vertebral artery dissection, as well as acute cervical disc herniation.",
+          "dual_doctor_debate": {
+            "active": true,
+            "dr_alpha_internist": {
+              "perspective": "Holistic & Conservative Internal Medicine",
+              "evaluation": "The patient is a young 25-year-old male with no significant prior medical history. 'Cramping' or 'colicky' pain in the neck highly suggests acute myofascial spasm, severe cervical strain, or acute torticollis, often precipitated by poor ergonomics, minor sudden movement, or stress.",
+              "suggested_approach": "Initiate aggressive oral analgesia, short-term muscle relaxants, gentle heat therapy, and localized physical therapy. Avoid invasive testing unless refractory or accompanied by neurological findings."
+            },
+            "dr_beta_emergency": {
+              "perspective": "Acute Care & Critical Life-Threat Rule-Out",
+              "evaluation": "A pain rating of 10/10 in the neck cannot be dismissed as a simple muscle cramp. In a 25-year-old, severe acute neck pain is a classic presentation for vertebral or carotid artery dissection, which can lead to stroke if missed. Cervical radiculopathy or spinal canal pathology must also be promptly investigated.",
+              "worst_case_rule_out": "Cervical Artery Dissection (Vertebral or Carotid) or Cervical Epidural Abscess/Hematoma."
+            },
+            "consensus_resolution": "Given the maximum pain intensity (10/10), the patient requires an urgent emergency department evaluation for immediate neurological examination and potential CT Angiography (CTA) or MRI. Conservative treatment for muscle spasm may proceed only after critical vascular and neurosurgical emergencies are definitively excluded."
+          },
+          "differential_diagnoses": [
+            {
+              "disease_name": "Acute Cervical Myospasm / Torticollis",
+              "likelihood": "High",
+              "matching_reasons": "Age demographic, absence of reported prior medical history, and classic description of cramping/colicky neck pain."
+            },
+            {
+              "disease_name": "Cervical Artery Dissection (Vertebral or Carotid)",
+              "likelihood": "Moderate",
+              "matching_reasons": "Sudden 10/10 severe localized neck pain in a young adult is a cardinal presentation."
+            },
+            {
+              "disease_name": "Cervical Radiculopathy / Acute Disc Herniation",
+              "likelihood": "Moderate",
+              "matching_reasons": "Severe localized pain caused by acute nerve root compression or spinal disc extrusion."
+            },
+            {
+              "disease_name": "Meningitis or Cervical Epidural Abscess",
+              "likelihood": "Low",
+              "matching_reasons": "Severe neck pain, though typically accompanied by fever, altered mental status, or systemic infection signs."
+            }
+          ],
+          "red_flag_symptoms": [
+            "Radiation of pain, numbness, tingling, or weakness in the arms or hands",
+            "Fever, chills, or night sweats",
+            "Inability to flex neck forward toward the chest (meningismus)",
+            "Asymmetry in pupils, facial drooping, or ptosis (Horner's syndrome)",
+            "Dizziness, vertigo, visual changes, or difficulty swallowing"
+          ],
+          "recommended_diagnostic_tests": [
+            "CT Angiogram (CTA) of the Head and Neck",
+            "MRI of the Cervical Spine",
+            "Comprehensive Neurological Examination",
+            "Inflammatory markers (ESR, CRP) and Complete Blood Count (CBC)"
+          ],
+          "paramedic_handover": {
+            "chief_complaint": "Severe 10/10 localized cramping/colicky cervical neck pain.",
+            "mechanism_or_triggers": "Acute onset; no documented antecedent trauma provided.",
+            "signs_and_symptoms": "Severe 10/10 neck pain, cramping character, localized cervical discomfort.",
+            "red_flag_warnings": "Extremely high pain severity (10/10) posing concern for cervical vascular dissection or acute disc injury.",
+            "immediate_suggested_interventions": "Assess upper extremity motor and sensory neurological function, maintain cervical spine alignment if spinal compromise suspected, monitor vital signs, transport urgently to nearest emergency facility."
+          },
+          "disclaimer": "AI clinical triage tool only. Not a substitute for professional board-certified evaluation."
+        },
+        "created_at": "Sep 03, 23:18",
+        "updated_at": "2026-09-03 23:18"
+      },
+      {
+        "id": "026b330f",
+        "title": "Differential Diagnoses A...",
+        "type": "chat",
+        "data": [
+          {
+            "role": "user",
+            "content": "Differential Diagnoses Acute Cervical Myospasm / Torticollis (High): Age demographic, absence of reported prior medical history, and classic description of cramping/colicky neck pain. Cervical Artery Dissection (Vertebral or Carotid) (Moderate): Sudden 10/10 severe localized neck pain in a young adult is a cardinal presentation. Cervical Radiculopathy / Acute Disc Herniation (Moderate): Severe localized pain caused by acute nerve root compression or spinal disc extrusion. Meningitis or Cervical Epidural Abscess (Low): Severe neck pain, though typically accompanied by fever, altered mental status, or systemic infection signs.    suggest me medicine"
+          },
+          {
+            "role": "user",
+            "content": "Differential Diagnoses Acute Cervical Myospasm / Torticollis (High): Age demographic, absence of reported prior medical history, and classic description of cramping/colicky neck pain. Cervical Artery Dissection (Vertebral or Carotid) (Moderate): Sudden 10/10 severe localized neck pain in a young adult is a cardinal presentation. Cervical Radiculopathy / Acute Disc Herniation (Moderate): Severe localized pain caused by acute nerve root compression or spinal disc extrusion. Meningitis or Cervical Epidural Abscess (Low): Severe neck pain, though typically accompanied by fever, altered mental status, or systemic infection signs.    suggest me medicine"
+          },
+          {
+            "role": "model",
+            "content": "Given the severity of the pain (**10/10, sudden onset**) and the potential for life-threatening conditions on your differential\u2014specifically **Cervical Artery Dissection** and **Meningitis**\u2014**you should not attempt to self-medicate at home.** Medication cannot be safely recommended without an in-person emergency evaluation.\n\n### Immediate Medical Triage\nYou need an immediate evaluation at the **Emergency Department**. Sudden, maximum-severity neck pain in a young adult requires urgent imaging (such as a CT angiogram or MRI) to rule out vascular or neurological emergencies.\n\n**Seek emergency care immediately if you experience any of the following \"red flag\" symptoms:**\n*   Neurological changes: facial drooping, arm/leg weakness, numbness, tingling, or difficulty speaking\n*   Visual disturbances, dizziness, loss of balance, or difficulty swallowing\n*   Fever, chills, stiff neck (inability to touch chin to chest), or confusion\n*   Pain radiating down one or both arms\n\n### General Information on Medical Management (Post-Evaluation)\nIf serious vascular, infectious, or neurological causes are fully ruled out by a physician, management for severe musculoskeletal neck spasms or radiculopathy generally involves:\n\n1.  **Analgesics / Anti-inflammatories:** Non-Steroidal Anti-Inflammatory Drugs (NSAIDs) like ibuprofen or naproxen (used cautiously, as NSAIDs can be contraindicated if vascular tears or bleeding risks are present).\n2.  **Muscle Relaxants:** Short-term prescriptions (e.g., cyclobenzaprine) for acute, severe myospasm, prescribed by a treating doctor.\n3.  **Supportive Care:** Temporary rest, gentle cold/heat application, and physical therapy once acute pain subsides.\n\n**Next Step:** Please go to the nearest Emergency Department or call local emergency services (e.g., 911) right away for a direct physical and diagnostic examination."
+          }
+        ],
+        "created_at": "Sep 03, 23:22",
+        "updated_at": "2026-09-03 23:22"
+      },
+      {
+        "id": "12176068",
+        "title": "hello...",
+        "type": "chat",
+        "data": [
+          {
+            "role": "user",
+            "content": "hello"
+          },
+          {
+            "role": "model",
+            "content": "Hello. I am HealthLens AI, your medical assistant. \n\nHow can I assist you today? Please share your symptoms, medical questions, or health concerns."
+          }
+        ],
+        "created_at": "Sep 03, 23:36",
+        "updated_at": "2026-09-03 23:36"
+      }
+    ]
+  }
+}
