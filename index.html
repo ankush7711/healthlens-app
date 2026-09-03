@@ -475,6 +475,35 @@
       border: 1px solid var(--success);
     }
 
+    /* Platform Choice Cards */
+    .platform-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-bottom: 1.2rem;
+    }
+
+    .platform-card {
+      background: rgba(15, 23, 42, 0.75);
+      border: 1px solid var(--card-border);
+      border-radius: 14px;
+      padding: 1.4rem 1rem;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      justify-content: space-between;
+    }
+
+    .platform-card:hover {
+      border-color: var(--primary);
+      background: rgba(56, 189, 248, 0.08);
+      transform: translateY(-3px);
+      box-shadow: 0 8px 25px var(--primary-glow);
+    }
+
     /* Point-to-Pain Mannequin Map */
     .body-map-container {
       display: flex;
@@ -671,8 +700,8 @@
         </div>
 
         <div class="header-right">
-          <!-- App Download / Install Button -->
-          <button type="button" class="btn btn-secondary" id="installAppBtn" onclick="installPWA()" style="padding: 0.4rem 0.75rem; font-size: 0.8rem;" title="Download & Install HealthLens App">
+          <!-- App Download Platform Selector Button -->
+          <button type="button" class="btn btn-secondary" id="platformDownloadBtn" onclick="openPlatformModal()" style="padding: 0.4rem 0.75rem; font-size: 0.8rem;" title="Download HealthLens AI">
             📱 Download App
           </button>
 
@@ -882,6 +911,50 @@
     </div>
   </div>
 
+  <!-- ==============================================================
+       Modal: Choose Platform (Windows vs Android)
+       ============================================================== -->
+  <div class="modal-backdrop" id="platformModal">
+    <div class="modal-box" style="max-width: 480px; text-align: center;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem;">
+        <h3 style="color: var(--primary); font-size: 1.25rem;">Download HealthLens AI</h3>
+        <button type="button" class="btn btn-secondary" onclick="closePlatformModal()" style="padding: 2px 8px;">✕</button>
+      </div>
+      <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.4rem;">
+        Select your platform to install or download HealthLens AI directly to your device:
+      </p>
+
+      <div class="platform-grid">
+        <!-- Windows Selection -->
+        <div class="platform-card" onclick="selectPlatform('windows')">
+          <div style="font-size: 2.8rem; margin-bottom: 0.5rem;">🪟</div>
+          <b style="font-size: 1.05rem; color: #fff;">Windows PC</b>
+          <p style="font-size: 0.76rem; color: var(--text-muted); margin: 0.4rem 0 0.8rem 0;">
+            Desktop Application for Windows 10 & 11
+          </p>
+          <button type="button" class="btn" style="width: 100%; font-size: 0.82rem; padding: 0.45rem 0.6rem;">
+            Download for Windows
+          </button>
+        </div>
+
+        <!-- Android Selection -->
+        <div class="platform-card" onclick="selectPlatform('android')">
+          <div style="font-size: 2.8rem; margin-bottom: 0.5rem;">🤖</div>
+          <b style="font-size: 1.05rem; color: #fff;">Android</b>
+          <p style="font-size: 0.76rem; color: var(--text-muted); margin: 0.4rem 0 0.8rem 0;">
+            Mobile App for Android Phones & Tablets
+          </p>
+          <button type="button" class="btn" style="width: 100%; font-size: 0.82rem; padding: 0.45rem 0.6rem;">
+            Download for Android
+          </button>
+        </div>
+      </div>
+
+      <!-- Contextual Platform Instructions / Alert Box -->
+      <div id="platformInstallFeedback" style="display: none; text-align: left; font-size: 0.83rem; background: rgba(56, 189, 248, 0.08); border: 1px solid var(--primary); padding: 0.85rem 1rem; border-radius: 10px; line-height: 1.45;"></div>
+    </div>
+  </div>
+
   <!-- Modal: Point to the Pain Anatomical Dialog -->
   <div class="modal-backdrop" id="bodyMapModal">
     <div class="modal-box" style="max-width: 520px;">
@@ -1028,25 +1101,64 @@
       initBodyMapInteractions();
     });
 
-    // PWA Install / App Download handler
+    // PWA Install prompt interceptor
     window.addEventListener('beforeinstallprompt', (e) => {
       e.preventDefault();
       deferredPrompt = e;
-      const btn = document.getElementById('installAppBtn');
-      if (btn) btn.style.display = 'inline-flex';
     });
 
-    function installPWA() {
-      if (deferredPrompt) {
-        deferredPrompt.prompt();
-        deferredPrompt.userChoice.then((choiceResult) => {
-          if (choiceResult.outcome === 'accepted') {
-            console.log('App installation accepted');
-          }
-          deferredPrompt = null;
-        });
-      } else {
-        alert("To install HealthLens AI as an App:\n\n• On Chrome/Edge (Desktop): Click the install icon (🖥️ or ➕) in the address bar.\n• On Android: Tap Chrome menu (⋮) -> 'Install App' or 'Add to Home screen'.\n• On iOS/Safari: Tap the 'Share' icon (⎋) -> scroll down and select 'Add to Home Screen'.");
+    // =============================================================
+    // PLATFORM DOWNLOAD MODAL HANDLERS (WINDOWS vs ANDROID)
+    // =============================================================
+    function openPlatformModal() {
+      const fb = document.getElementById('platformInstallFeedback');
+      if (fb) fb.style.display = 'none';
+      document.getElementById('platformModal').style.display = 'flex';
+    }
+
+    function closePlatformModal() {
+      document.getElementById('platformModal').style.display = 'none';
+    }
+
+    function selectPlatform(platform) {
+      const fb = document.getElementById('platformInstallFeedback');
+      fb.style.display = 'block';
+
+      if (platform === 'windows') {
+        if (deferredPrompt) {
+          deferredPrompt.prompt();
+          deferredPrompt.userChoice.then((choiceResult) => {
+            if (choiceResult.outcome === 'accepted') {
+              fb.innerHTML = `✅ <b>Windows Installation Started:</b> HealthLens AI is now installed to your Windows Desktop and Start Menu.`;
+            }
+            deferredPrompt = null;
+          });
+        } else {
+          fb.innerHTML = `
+            <b style="color: var(--primary);">🪟 Windows Installation Guide:</b><br>
+            1. In Google Chrome or Microsoft Edge on your PC, look at the right side of the address bar.<br>
+            2. Click the <b>Install App icon (🖥️ or ➕)</b>.<br>
+            3. Click <b>Install</b>. HealthLens AI will open in its own borderless desktop window and place a shortcut on your Desktop & Start Menu.
+          `;
+        }
+      } else if (platform === 'android') {
+        if (deferredPrompt) {
+          deferredPrompt.prompt();
+          deferredPrompt.userChoice.then((choiceResult) => {
+            if (choiceResult.outcome === 'accepted') {
+              fb.innerHTML = `✅ <b>Android App Added:</b> HealthLens AI has been added to your app drawer and home screen.`;
+            }
+            deferredPrompt = null;
+          });
+        } else {
+          fb.innerHTML = `
+            <b style="color: #10b981;">🤖 Android Installation Guide:</b><br>
+            1. Open this website in Chrome on your Android phone or tablet.<br>
+            2. Tap the <b>three dots menu (⋮)</b> in the top-right corner.<br>
+            3. Tap <b>"Install app"</b> or <b>"Add to Home screen"</b>.<br>
+            4. Confirm by tapping <b>Install</b>. HealthLens AI will appear alongside your native Android apps.
+          `;
+        }
       }
     }
 
