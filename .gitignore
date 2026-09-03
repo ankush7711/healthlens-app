@@ -1,48 +1,4 @@
-# 1. Critical Secrets & Keys
 .env
-*.env
-*.key
-*.pem
-credentials.json
-service_account.json
-
-# 2. Local User / Patient Data
-users.json
-*.db
-*.sqlite
-*.sqlite3
-
-# 3. Python Virtual Environments
+__pycache__/
 venv/
 .venv/
-env/
-ENV/
-
-# 4. Bytecode & Cache
-__pycache__/
-*.py[cod]
-*$py.class
-.pytest_cache/
-
-# 5. Large AI Models, Checkpoints & Weights (>100MB)
-*.pt
-*.pth
-*.bin
-*.onnx
-*.safetensors
-*.h5
-*.pkl
-*.gguf
-
-# 6. Uploaded Files & Temporary Scans
-uploads/
-temp/
-*.dcm
-*.webm
-*.wav
-
-# 7. OS & IDE metadata
-.vscode/
-.idea/
-.DS_Store
-Thumbs.db
