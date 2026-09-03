@@ -1,0 +1,15 @@
+{
+  "name": "HealthLens AI Diagnostics",
+  "short_name": "HealthLens",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#090d16",
+  "theme_color": "#0284c7",
+  "icons": [
+    {
+      "src": "/icon.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

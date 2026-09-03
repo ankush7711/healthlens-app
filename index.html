@@ -1,0 +1,1985 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta name="google-site-verification" content="ffUsY4wHfPUKgGSKGT2kXW5-v7i9mK92b82mXq1KQtg" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HealthLens AI - Comprehensive Clinical Diagnostic Suite</title>
+  <link rel="manifest" href="/manifest.json" />
+  <meta name="theme-color" content="#0284c7" />
+
+  <!-- Client-Side PDF & Image Export Engines -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+  <style>
+    :root {
+      --bg: #090d16;
+      --sidebar-bg: #0d121f;
+      --card-bg: rgba(20, 27, 45, 0.75);
+      --card-border: rgba(255, 255, 255, 0.08);
+      --primary: #38bdf8;
+      --primary-glow: rgba(56, 189, 248, 0.35);
+      --btn-grad: linear-gradient(135deg, #0284c7, #0369a1);
+      --text: #f1f5f9;
+      --text-muted: #94a3b8;
+      --danger: #ef4444;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --sidebar-width: 275px;
+    }
+
+    /* Incognito Stealth Theme */
+    body.incognito-theme {
+      background: radial-gradient(circle at top, #24123a 0%, #08040f 100%) !important;
+      --sidebar-bg: #10081c;
+      --card-bg: rgba(28, 16, 48, 0.78);
+      --card-border: rgba(192, 132, 252, 0.22);
+      --primary: #c084fc;
+      --primary-glow: rgba(192, 132, 252, 0.45);
+      --btn-grad: linear-gradient(135deg, #9333ea, #6b21a8);
+      --text-muted: #a78bfa;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    body {
+      background: radial-gradient(circle at top, #131d33 0%, #090d16 100%);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      overflow-x: hidden;
+      transition: background 0.4s ease;
+    }
+
+    .app-layout {
+      display: flex;
+      width: 100vw;
+      min-height: 100vh;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: var(--sidebar-width);
+      background: var(--sidebar-bg);
+      border-right: 1px solid var(--card-border);
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+      transition: transform 0.3s ease, background 0.4s ease;
+      z-index: 100;
+    }
+
+    .sidebar-header {
+      padding: 1rem 1.1rem;
+      border-bottom: 1px solid var(--card-border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .sidebar-actions {
+      padding: 0.85rem 1rem 0.4rem 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.45rem;
+    }
+
+    .new-chat-btn {
+      background: rgba(56, 189, 248, 0.12);
+      color: var(--primary);
+      border: 1px dashed var(--primary);
+      padding: 0.75rem 1rem;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 0.88rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      justify-content: center;
+      transition: all 0.25s;
+    }
+
+    .new-chat-btn:hover {
+      background: var(--primary-glow);
+      transform: translateY(-1px);
+    }
+
+    .incognito-entry-btn {
+      background: rgba(168, 85, 247, 0.12);
+      color: #c084fc;
+      border: 1px solid rgba(168, 85, 247, 0.35);
+      padding: 0.6rem 1rem;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 0.82rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      justify-content: center;
+      transition: all 0.25s;
+    }
+
+    .incognito-entry-btn:hover {
+      background: rgba(168, 85, 247, 0.25);
+      box-shadow: 0 0 12px rgba(168, 85, 247, 0.3);
+    }
+
+    .history-list {
+      flex: 1;
+      overflow-y: auto;
+      padding: 0.5rem 0.75rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+    }
+
+    .history-item {
+      padding: 0.65rem 0.8rem;
+      border-radius: 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+      font-size: 0.86rem;
+      color: var(--text-muted);
+      transition: all 0.2s;
+      border: 1px solid transparent;
+    }
+
+    .history-item:hover, .history-item.active {
+      background: rgba(255, 255, 255, 0.05);
+      color: #fff;
+    }
+
+    .history-item.active {
+      border-color: var(--primary);
+      background: var(--primary-glow);
+      color: var(--primary);
+    }
+
+    .history-del-btn {
+      opacity: 0;
+      background: transparent;
+      border: none;
+      color: #94a3b8;
+      cursor: pointer;
+      font-size: 0.85rem;
+      padding: 2px 4px;
+      border-radius: 4px;
+    }
+
+    .history-item:hover .history-del-btn {
+      opacity: 1;
+    }
+
+    .history-del-btn:hover {
+      color: var(--danger);
+    }
+
+    .sidebar-footer {
+      padding: 1rem;
+      border-top: 1px solid var(--card-border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+      font-size: 0.84rem;
+    }
+
+    .user-pill {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      cursor: pointer;
+    }
+
+    .user-avatar {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: var(--btn-grad);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      color: #fff;
+      font-size: 0.75rem;
+    }
+
+    /* Main Area */
+    .main-wrapper {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow-y: auto;
+    }
+
+    header {
+      background: rgba(15, 23, 42, 0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--card-border);
+      padding: 0.8rem 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-weight: 800;
+      font-size: 1.15rem;
+      color: var(--primary);
+    }
+
+    .status-badge {
+      font-size: 0.78rem;
+      background: rgba(56, 189, 248, 0.1);
+      color: var(--primary);
+      padding: 0.35rem 0.75rem;
+      border-radius: 99px;
+      border: 1px solid var(--primary-glow);
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .container {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 1.5rem 1rem;
+      width: 100%;
+      flex: 1;
+    }
+
+    .tabs {
+      display: flex;
+      background: rgba(15, 23, 42, 0.6);
+      padding: 0.35rem;
+      border-radius: 12px;
+      border: 1px solid var(--card-border);
+      margin-bottom: 1.5rem;
+      gap: 0.35rem;
+      overflow-x: auto;
+    }
+
+    .tab-btn {
+      flex: 1;
+      min-width: 130px;
+      padding: 0.7rem 0.5rem;
+      background: transparent;
+      color: var(--text-muted);
+      border: none;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 0.84rem;
+      cursor: pointer;
+      transition: all 0.25s;
+      white-space: nowrap;
+      text-align: center;
+    }
+
+    .tab-btn.active {
+      background: var(--btn-grad);
+      color: #fff;
+      box-shadow: 0 4px 15px var(--primary-glow);
+    }
+
+    .card {
+      background: var(--card-bg);
+      backdrop-filter: blur(16px);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 1.75rem;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+      margin-bottom: 1.5rem;
+      animation: slideUp 0.3s ease-out;
+    }
+
+    .form-group {
+      margin-bottom: 1.2rem;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      margin-bottom: 0.4rem;
+    }
+
+    .form-control {
+      width: 100%;
+      background: rgba(15, 23, 42, 0.7);
+      border: 1px solid var(--card-border);
+      color: #fff;
+      padding: 0.75rem 1rem;
+      border-radius: 10px;
+      font-size: 0.95rem;
+      outline: none;
+    }
+
+    .form-control:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .form-control:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px var(--primary-glow);
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+
+    @media (max-width: 640px) {
+      .grid-2 { grid-template-columns: 1fr; }
+    }
+
+    .btn {
+      background: var(--btn-grad);
+      color: #fff;
+      border: none;
+      padding: 0.85rem 1.25rem;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 0.95rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      transition: all 0.25s;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px var(--primary-glow);
+    }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text-muted);
+    }
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.16);
+      color: #fff;
+    }
+
+    .btn-alert {
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+      color: #000;
+      font-weight: 800;
+    }
+
+    .btn-stop {
+      background: rgba(239, 68, 68, 0.2);
+      border: 1px solid #ef4444;
+      color: #ef4444;
+      font-weight: 700;
+    }
+
+    .btn-stop:hover {
+      background: #ef4444;
+      color: #fff;
+    }
+
+    .export-group {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .dropzone {
+      border: 2px dashed var(--primary);
+      background: rgba(15, 23, 42, 0.4);
+      border-radius: 14px;
+      padding: 2.2rem 1rem;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 0.35rem 0.75rem;
+      border-radius: 99px;
+      font-size: 0.75rem;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+
+    .badge-emergency, .badge-critical {
+      background: rgba(239, 68, 68, 0.2);
+      color: var(--danger);
+      border: 1px solid var(--danger);
+    }
+
+    .badge-urgent, .badge-moderate, .badge-borderline {
+      background: rgba(245, 158, 11, 0.2);
+      color: var(--warning);
+      border: 1px solid var(--warning);
+    }
+
+    .badge-mild, .badge-routine-visit, .badge-normal, .badge-self-care {
+      background: rgba(16, 185, 129, 0.2);
+      color: var(--success);
+      border: 1px solid var(--success);
+    }
+
+    /* Point-to-Pain Mannequin Map */
+    .body-map-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+      background: rgba(10, 15, 28, 0.6);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 1.5rem;
+    }
+
+    .body-svg {
+      max-width: 280px;
+      height: auto;
+      filter: drop-shadow(0 0 10px rgba(56, 189, 248, 0.2));
+    }
+
+    .body-zone {
+      cursor: pointer;
+      fill: rgba(56, 189, 248, 0.25);
+      stroke: var(--primary);
+      stroke-width: 1.5;
+      transition: all 0.2s;
+    }
+
+    .body-zone:hover {
+      fill: rgba(245, 158, 11, 0.6);
+      stroke: #f59e0b;
+    }
+
+    .body-zone.selected {
+      fill: rgba(239, 68, 68, 0.7) !important;
+      stroke: #ef4444 !important;
+    }
+
+    .dual-doctor-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .doctor-card {
+      background: rgba(15, 23, 42, 0.7);
+      border-radius: 12px;
+      padding: 1.1rem;
+      border: 1px solid var(--card-border);
+    }
+
+    .doctor-card.alpha { border-top: 3px solid #0284c7; }
+    .doctor-card.beta { border-top: 3px solid #ef4444; }
+
+    .pacs-viewer {
+      background: #000;
+      border-radius: 12px;
+      padding: 0.5rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    #pacsCanvas {
+      width: 100%;
+      max-height: 480px;
+      object-fit: contain;
+      border-radius: 8px;
+    }
+
+    .paramedic-card {
+      background: #000000 !important;
+      color: #facc15 !important;
+      border: 3px solid #eab308 !important;
+      border-radius: 14px;
+      padding: 1.5rem;
+    }
+
+    .paramedic-header {
+      border-bottom: 2px dashed #eab308;
+      padding-bottom: 0.8rem;
+      margin-bottom: 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(8px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 200;
+      padding: 1rem;
+    }
+
+    .modal-box {
+      background: #0f172a;
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 1.8rem;
+      max-width: 480px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    .chat-box {
+      height: 52vh;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      padding: 1rem;
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      margin-bottom: 1rem;
+      background: rgba(15, 23, 42, 0.4);
+    }
+
+    .msg {
+      max-width: 80%;
+      padding: 0.75rem 1rem;
+      border-radius: 12px;
+      font-size: 0.92rem;
+      line-height: 1.45;
+      white-space: pre-wrap;
+    }
+
+    .msg-user {
+      align-self: flex-end;
+      background: var(--btn-grad);
+      color: #fff;
+    }
+
+    .msg-assistant {
+      align-self: flex-start;
+      background: rgba(30, 41, 59, 0.8);
+      border: 1px solid var(--card-border);
+      color: var(--text);
+    }
+
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-layout">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <span style="font-weight: 800; color: var(--primary);" id="sidebarTitle">Diagnostic Records</span>
+        <button class="btn btn-secondary" onclick="toggleSidebar()" style="padding: 2px 6px; font-size: 0.8rem;">✕</button>
+      </div>
+
+      <div class="sidebar-actions">
+        <button class="new-chat-btn" onclick="startNewSession()">
+          <span>＋</span> New Consultation
+        </button>
+        <button class="incognito-entry-btn" onclick="enterIncognitoMode()">
+          <span>🕶️</span> Incognito Mode
+        </button>
+      </div>
+
+      <div class="history-list" id="historyList">
+        <div style="text-align: center; color: #64748b; font-size: 0.8rem; margin-top: 2rem;">No clinical sessions yet</div>
+      </div>
+
+      <div class="sidebar-footer">
+        <div class="user-pill" onclick="openAuthModal()">
+          <div class="user-avatar" id="userAvatar">?</div>
+          <div>
+            <div style="font-weight: 700;" id="userLabel">Guest Mode</div>
+            <div style="font-size: 0.72rem; color: #64748b;" id="userSub">Sign in to sync</div>
+          </div>
+        </div>
+        <button id="authActionBtn" class="history-del-btn" style="opacity: 1;" onclick="handleAuthAction()" title="Sign In">🔑</button>
+      </div>
+    </aside>
+
+    <!-- Main Workspace -->
+    <div class="main-wrapper">
+      <header>
+        <div class="header-left">
+          <button class="btn btn-secondary" onclick="toggleSidebar()" style="padding: 0.4rem 0.6rem;">☰</button>
+          <div class="brand">
+            <span id="brandIcon">🛡️</span> <span id="brandText">HealthLens AI</span>
+          </div>
+        </div>
+        <span class="status-badge" id="modelBadge">
+          <span>●</span> gemini-3.6-flash Active
+        </span>
+      </header>
+
+      <main class="container">
+        <!-- Navigation Tabs -->
+        <div class="tabs">
+          <button class="tab-btn active" onclick="switchTab('symptoms', event)">🩺 Symptoms & Pain Map</button>
+          <button class="tab-btn" onclick="switchTab('scans', event)">🩻 PACS Radiography</button>
+          <button class="tab-btn" onclick="switchTab('rx', event)">📋 Rx & Lab Decoder</button>
+          <button class="tab-btn" onclick="switchTab('audio', event)">🎙️ Acoustic Cough AI</button>
+          <button class="tab-btn" onclick="switchTab('chat', event)">💬 Clinical Assistant</button>
+        </div>
+
+        <!-- ==============================================================
+             Tab 1: Symptoms Check + Point-to-Pain Dialog
+             ============================================================== -->
+        <section id="tab-symptoms" class="tab-pane">
+          <div class="card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+              <div>
+                <h2 style="font-size: 1.25rem;">Triage & Anatomical Symptom Check</h2>
+                <p style="font-size: 0.85rem; color: var(--text-muted);">Pinpoint pain zones on the interactive body map or describe symptoms.</p>
+              </div>
+              <button type="button" class="btn btn-secondary" onclick="openBodyMapModal()" style="font-size: 0.82rem; padding: 0.5rem 0.9rem;">
+                📍 Point to the Pain
+              </button>
+            </div>
+
+            <div id="activePainBadges" style="display: none; margin-bottom: 1rem; padding: 0.6rem 0.8rem; background: rgba(56, 189, 248, 0.08); border: 1px solid var(--primary); border-radius: 8px;">
+              <b style="font-size: 0.8rem; color: var(--primary);">Mapped Pain Findings:</b>
+              <div id="painPills" style="display: flex; gap: 0.4rem; flex-wrap: wrap; margin-top: 0.3rem;"></div>
+            </div>
+
+            <form onsubmit="handleSymptomSubmit(event)">
+              <div class="form-group">
+                <label>Clinical Description / Complaints *</label>
+                <textarea id="symText" class="form-control" rows="3" placeholder="Describe symptoms (e.g. sharp right lower quadrant abdominal pain, nausea, fever)..." required></textarea>
+              </div>
+
+              <div class="grid-2">
+                <div class="form-group">
+                  <label>Age</label>
+                  <input type="number" id="symAge" class="form-control" placeholder="38" />
+                </div>
+                <div class="form-group">
+                  <label>Sex</label>
+                  <select id="symSex" class="form-control">
+                    <option value="">Unspecified</option>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                  </select>
+                </div>
+              </div>
+
+              <div style="margin: 0.5rem 0 1.2rem 0; padding: 0.75rem 1rem; background: rgba(255, 255, 255, 0.03); border: 1px solid var(--card-border); border-radius: 10px; display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                  <b style="font-size: 0.88rem; color: var(--text);">🩺 Dual-Doctor Second Opinion Simulation</b>
+                  <p style="font-size: 0.76rem; color: var(--text-muted);">Pits Dr. Alpha (Conservative Internist) vs Dr. Beta (Emergency Specialist).</p>
+                </div>
+                <input type="checkbox" id="dualDoctorToggle" style="width: 20px; height: 20px; cursor: pointer;" />
+              </div>
+
+              <button type="submit" id="symBtn" class="btn" style="width: 100%;">Run Comprehensive Assessment</button>
+            </form>
+
+            <div id="symResult" style="display: none; margin-top: 1.5rem; border-top: 1px solid var(--card-border); padding-top: 1rem;"></div>
+          </div>
+        </section>
+
+        <!-- ==============================================================
+             Tab 2: CT / DICOM Radiography + PACS Slice Scrubber
+             ============================================================== -->
+        <section id="tab-scans" class="tab-pane" style="display: none;">
+          <div class="card">
+            <h2 style="font-size: 1.2rem; margin-bottom: 0.4rem;">PACS Radiography Studio & Slice Scrubber</h2>
+            <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.2rem;">Upload DICOM stacks or scan images to scrub through slices in real time.</p>
+
+            <form onsubmit="handleScanSubmit(event)">
+              <div class="dropzone" onclick="document.getElementById('scanFile').click()">
+                <p style="font-size: 2.2rem; margin-bottom: 0.4rem;">🩻</p>
+                <p style="font-weight: 700; color: var(--primary);">Click or Drag DICOM Slices / Scan Files</p>
+                <p id="fileLabel" style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.25rem;">Supports multi-file DICOM stacks (.dcm), PNG, JPG</p>
+                <input type="file" id="scanFile" multiple accept=".dcm,image/*" style="display: none;" onchange="handleScanFilesLoaded(event)" />
+              </div>
+
+              <div id="pacsContainer" style="display: none; margin-top: 1.2rem;" class="pacs-viewer">
+                <canvas id="pacsCanvas"></canvas>
+                <div style="width: 100%; display: flex; align-items: center; gap: 1rem;">
+                  <span style="font-size: 0.8rem; color: #94a3b8;" id="sliceCounter">Slice: 1/1</span>
+                  <input type="range" id="sliceSlider" min="0" max="0" value="0" style="flex: 1; cursor: pointer;" oninput="onSliceChange(this.value)" />
+                </div>
+                <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                  <button type="button" class="btn btn-secondary" style="padding: 0.35rem 0.75rem; font-size: 0.75rem;" onclick="applyPacsWindow('soft')">Soft Tissue</button>
+                  <button type="button" class="btn btn-secondary" style="padding: 0.35rem 0.75rem; font-size: 0.75rem;" onclick="applyPacsWindow('bone')">Bone Window</button>
+                  <button type="button" class="btn btn-secondary" style="padding: 0.35rem 0.75rem; font-size: 0.75rem;" onclick="applyPacsWindow('lung')">Lung Window</button>
+                  <button type="button" class="btn btn-secondary" style="padding: 0.35rem 0.75rem; font-size: 0.75rem;" onclick="applyPacsWindow('brain')">Brain Window</button>
+                  <button type="button" class="btn btn-secondary" style="padding: 0.35rem 0.75rem; font-size: 0.75rem;" onclick="applyPacsWindow('invert')">Invert</button>
+                </div>
+              </div>
+
+              <div class="grid-2" style="margin-top: 1.2rem;">
+                <div class="form-group">
+                  <label>Confirmed Region</label>
+                  <input type="text" id="scanRegion" class="form-control" placeholder="e.g. Chest / Abdomen" />
+                </div>
+                <div class="form-group">
+                  <label>Clinical Correlates</label>
+                  <input type="text" id="scanSymptoms" class="form-control" placeholder="e.g. Dyspnea, hemoptysis" />
+                </div>
+              </div>
+
+              <button type="submit" id="scanBtn" class="btn" style="width: 100%;">Evaluate Radiology Slices</button>
+            </form>
+
+            <div id="scanResult" style="display: none; margin-top: 1.5rem; border-top: 1px solid var(--card-border); padding-top: 1rem;"></div>
+          </div>
+        </section>
+
+        <!-- ==============================================================
+             Tab 3: Prescription & Lab Report Decoder (OCR)
+             ============================================================== -->
+        <section id="tab-rx" class="tab-pane" style="display: none;">
+          <div class="card">
+            <h2 style="font-size: 1.2rem; margin-bottom: 0.4rem;">Prescription & Pathology Lab Decoder</h2>
+            <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.2rem;">Upload doctor prescription slips or blood panels (CBC, Metabolic, Lipid) to translate abbreviations and view color-coded reference ranges.</p>
+
+            <div class="dropzone" onclick="document.getElementById('rxFileInput').click()">
+              <p style="font-size: 2.2rem; margin-bottom: 0.4rem;">📋</p>
+              <p style="font-weight: 700; color: var(--primary);">Upload Prescription or Lab Report Image</p>
+              <p id="rxLabel" style="font-size: 0.8rem; color: var(--text-muted);">Supports JPG, PNG (camera snapshots welcome)</p>
+              <input type="file" id="rxFileInput" accept="image/*" style="display: none;" onchange="handleRxFileSelected(event)" />
+            </div>
+
+            <button type="button" id="rxBtn" class="btn" style="width: 100%; margin-top: 1.2rem;" onclick="submitRxDecoder()">
+              Decode Medications & Lab Biomarkers
+            </button>
+
+            <div id="rxResult" style="display: none; margin-top: 1.5rem; border-top: 1px solid var(--card-border); padding-top: 1rem;"></div>
+          </div>
+        </section>
+
+        <!-- ==============================================================
+             Tab 4: Acoustic Cough & Wheeze Analyzer
+             ============================================================== -->
+        <section id="tab-audio" class="tab-pane" style="display: none;">
+          <div class="card" style="text-align: center;">
+            <h2 style="font-size: 1.25rem; margin-bottom: 0.4rem;">Acoustic Cough & Wheeze Sound Analyzer</h2>
+            <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.5rem;">Record a 5-second sample of your cough or deep exhalation to evaluate acoustic markers for croup, asthmatic wheeze, or productive bronchitis.</p>
+
+            <div style="margin: 1.5rem 0;">
+              <button type="button" id="recordBtn" onclick="toggleAudioRecording()" style="width: 90px; height: 90px; border-radius: 50%; background: #ef4444; border: 4px solid rgba(239, 68, 68, 0.4); color: #fff; font-size: 2rem; cursor: pointer; transition: all 0.3s; box-shadow: 0 0 20px rgba(239, 68, 68, 0.5);">
+                🎙️
+              </button>
+              <p id="recordStatus" style="font-size: 0.9rem; font-weight: 700; color: var(--text-muted); margin-top: 0.8rem;">Tap to Start 5s Audio Capture</p>
+            </div>
+
+            <div id="coughResult" style="display: none; text-align: left; margin-top: 1.5rem; border-top: 1px solid var(--card-border); padding-top: 1rem;"></div>
+          </div>
+        </section>
+
+        <!-- ==============================================================
+             Tab 5: Chat Assistant with PDF & PNG / JPG Downloads
+             ============================================================== -->
+        <section id="tab-chat" class="tab-pane" style="display: none;">
+          <div class="card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem; flex-wrap: wrap; gap: 0.5rem;">
+              <h2 style="font-size: 1.2rem;">HealthLens AI Clinical Assistant</h2>
+              <div class="export-group">
+                <button type="button" class="btn btn-secondary" onclick="exportElementAsPdf('chatBox', 'clinical_chat_transcript')" style="padding: 0.45rem 0.75rem; font-size: 0.8rem;" title="Download as PDF">
+                  📄 PDF
+                </button>
+                <button type="button" class="btn btn-secondary" onclick="exportElementAsImage('chatBox', 'clinical_chat_image', 'png')" style="padding: 0.45rem 0.75rem; font-size: 0.8rem;" title="Download as PNG">
+                  🖼️ PNG
+                </button>
+                <button type="button" class="btn btn-secondary" onclick="exportElementAsImage('chatBox', 'clinical_chat_image', 'jpg')" style="padding: 0.45rem 0.75rem; font-size: 0.8rem;" title="Download as JPG">
+                  🖼️ JPG
+                </button>
+              </div>
+            </div>
+
+            <div id="chatBox" class="chat-box">
+              <div class="msg msg-assistant">Hello! I am HealthLens AI assistant. Ask any follow-up question regarding diagnoses, scans, medications, or lab values.</div>
+            </div>
+            
+            <form onsubmit="handleChatSubmit(event)" style="display: flex; gap: 0.5rem;" id="chatForm">
+              <input type="text" id="chatInput" class="form-control" placeholder="Ask a clinical question..." required autocomplete="off" />
+              <button type="submit" id="chatSendBtn" class="btn">Send</button>
+              <button type="button" id="chatCancelBtn" class="btn btn-stop" onclick="cancelChatStream()" style="display: none;">
+                ⏹ Stop
+              </button>
+            </form>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <!-- Modal: Point to the Pain Anatomical Dialog -->
+  <div class="modal-backdrop" id="bodyMapModal">
+    <div class="modal-box" style="max-width: 520px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem;">
+        <h3 style="color: var(--primary);">📍 Point to the Pain</h3>
+        <button type="button" class="btn btn-secondary" onclick="closeBodyMapModal()" style="padding: 2px 8px;">✕</button>
+      </div>
+      <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1rem;">Click the anatomic region where pain or discomfort is felt:</p>
+
+      <div class="body-map-container">
+        <svg class="body-svg" viewBox="0 0 200 360" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="100" cy="30" r="20" class="body-zone" data-zone="Head / Cranial" />
+          <rect x="92" y="52" width="16" height="15" rx="3" class="body-zone" data-zone="Neck / Cervical" />
+          <path d="M 70 70 L 130 70 L 125 115 L 75 115 Z" class="body-zone" data-zone="Chest / Precordial" />
+          <rect x="76" y="120" width="48" height="25" class="body-zone" data-zone="Epigastric / RUQ-LUQ" />
+          <rect x="76" y="148" width="24" height="28" class="body-zone" data-zone="Right Lower Quadrant (RLQ - Appendix)" />
+          <rect x="100" y="148" width="24" height="28" class="body-zone" data-zone="Left Lower Quadrant (LLQ)" />
+          <path d="M 76 178 L 124 178 L 115 205 L 85 205 Z" class="body-zone" data-zone="Pelvic / Suprapubic" />
+          <path d="M 68 72 L 50 140 L 40 140 L 58 72 Z" class="body-zone" data-zone="Right Arm / Shoulder" />
+          <path d="M 132 72 L 150 140 L 160 140 L 142 72 Z" class="body-zone" data-zone="Left Arm / Shoulder" />
+          <path d="M 82 210 L 76 340 L 92 340 L 96 210 Z" class="body-zone" data-zone="Right Leg / Knee" />
+          <path d="M 104 210 L 108 340 L 124 340 L 118 210 Z" class="body-zone" data-zone="Left Leg / Knee" />
+        </svg>
+
+        <div style="width: 100%; font-size: 0.82rem;">
+          <div style="margin-bottom: 0.5rem;">
+            <b>Selected Region:</b> <span id="dialogZoneName" style="color: var(--primary);">None selected</span>
+          </div>
+
+          <div class="form-group">
+            <label>Pain Severity: <span id="painVal">5</span>/10</label>
+            <input type="range" id="painSlider" min="1" max="10" value="5" style="width: 100%;" oninput="document.getElementById('painVal').innerText=this.value" />
+          </div>
+
+          <div class="form-group">
+            <label>Pain Character</label>
+            <select id="painCharSelect" class="form-control">
+              <option value="Sharp / Stabbing">Sharp / Stabbing</option>
+              <option value="Dull / Aching">Dull / Aching</option>
+              <option value="Burning / Pleuritic">Burning / Pleuritic</option>
+              <option value="Throbbing / Pulsatile">Throbbing / Pulsatile</option>
+              <option value="Colicky / Cramping">Colicky / Cramping</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Radiation (Optional)</label>
+            <input type="text" id="painRadiation" class="form-control" placeholder="e.g. Radiates to left jaw / groin" />
+          </div>
+
+          <button type="button" class="btn" style="width: 100%;" onclick="applyPainZoneToForm()">
+            Apply Anatomical Finding to Assessment
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Paramedic Handover Sheet (Emergency Mode) -->
+  <div class="modal-backdrop" id="paramedicModal">
+    <div class="modal-box paramedic-card" style="max-width: 600px;">
+      <div class="paramedic-header">
+        <div>
+          <h2 style="font-size: 1.4rem; letter-spacing: 0.05em;">🚨 EMT PARAMEDIC HANDOVER SHEET</h2>
+          <p style="font-size: 0.8rem; color: #fef08a;">SBAR / MIST Emergency Pre-Hospital Report</p>
+        </div>
+        <button type="button" onclick="closeParamedicModal()" style="background: transparent; border: 1px solid #eab308; color: #facc15; font-size: 1.1rem; padding: 4px 8px; cursor: pointer;">✕</button>
+      </div>
+
+      <div id="paramedicContent" style="font-family: monospace; font-size: 0.9rem; line-height: 1.5;"></div>
+
+      <div style="margin-top: 1.2rem; text-align: center; border-top: 1px dashed #eab308; padding-top: 1rem;">
+        <p style="font-size: 0.78rem; margin-bottom: 0.5rem; color: #fef08a;">EMERGENCY SCAN QR (Raw Handover Data for ER Triage)</p>
+        <img id="paramedicQr" style="width: 140px; height: 140px; background: #fff; padding: 4px; border-radius: 6px;" alt="Handover QR" />
+      </div>
+
+      <div style="display: flex; gap: 0.5rem; margin-top: 1.2rem; flex-wrap: wrap;">
+        <button type="button" class="btn btn-alert" onclick="exportElementAsPdf('paramedicModal', 'emt_handover_report')" style="flex: 1;">
+          📄 Download PDF
+        </button>
+        <button type="button" class="btn btn-secondary" onclick="exportElementAsImage('paramedicModal', 'emt_handover_image', 'png')" style="flex: 1;">
+          🖼️ PNG
+        </button>
+        <button type="button" class="btn btn-secondary" onclick="exportElementAsImage('paramedicModal', 'emt_handover_image', 'jpg')" style="flex: 1;">
+          🖼️ JPG
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Authentication -->
+  <div class="modal-backdrop" id="authModal">
+    <div class="modal-box">
+      <h3 id="modalTitle" style="color: var(--primary); margin-bottom: 0.4rem;">Sign In to HealthLens</h3>
+      <p style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 1.2rem;">Sync your clinical records & chats across devices.</p>
+      <form onsubmit="handleAuthSubmit(event)">
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" id="authEmail" class="form-control" required placeholder="doctor@clinic.org" />
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" id="authPassword" class="form-control" required minlength="6" placeholder="••••••••" />
+        </div>
+        <div style="display: flex; gap: 0.5rem; margin-top: 1rem;">
+          <button type="submit" class="btn" id="authSubmitBtn" style="flex: 1;">Login</button>
+          <button type="button" class="btn btn-secondary" onclick="closeAuthModal()">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // -------------------------------------------------------------
+    // Application State & PDF / Image Export Engines
+    // -------------------------------------------------------------
+    let currentUser = JSON.parse(localStorage.getItem('healthlens_user') || 'null');
+    let currentSessionId = null;
+    let chatHistory = [];
+    let isIncognito = false;
+    let chatAbortController = null;
+    let currentHandoverData = null;
+
+    // Body Map State
+    let selectedZone = null;
+    let mappedPainData = null;
+
+    // PACS Scrubber State
+    let pacsSlices = [];
+    let currentSliceIdx = 0;
+    let activeFilter = 'normal';
+
+    window.addEventListener('DOMContentLoaded', () => {
+      updateUserUI();
+      loadHistory();
+      initBodyMapInteractions();
+    });
+
+    function toggleSidebar() {
+      document.getElementById('sidebar').classList.toggle('open');
+    }
+
+    // =============================================================
+    // UNIVERSAL PDF EXPORT FUNCTION
+    // =============================================================
+    async function exportElementAsPdf(elementId, baseFileName) {
+      const el = document.getElementById(elementId);
+      if (!el) {
+        alert("No content available to export as PDF.");
+        return;
+      }
+
+      const origScroll = el.scrollTop;
+      const origHeight = el.style.height;
+      const origMaxH = el.style.maxHeight;
+
+      try {
+        // Expand element fully so scrollable contents are visible in the capture
+        el.style.height = "auto";
+        el.style.maxHeight = "none";
+        el.style.overflow = "visible";
+
+        const canvas = await html2canvas(el, {
+          scale: 2,
+          useCORS: true,
+          logging: false,
+          backgroundColor: '#0f172a'
+        });
+
+        const imgData = canvas.toDataURL('image/png');
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF('p', 'mm', 'a4');
+        const pageWidth = pdf.internal.pageSize.getWidth();
+        const pageHeight = pdf.internal.pageSize.getHeight();
+        const margin = 10;
+        const printWidth = pageWidth - (margin * 2);
+        const printHeight = (canvas.height * printWidth) / canvas.width;
+
+        let heightLeft = printHeight;
+        let position = margin;
+
+        pdf.addImage(imgData, 'PNG', margin, position, printWidth, printHeight);
+        heightLeft -= (pageHeight - (margin * 2));
+
+        while (heightLeft > 0) {
+          position = heightLeft - printHeight + margin;
+          pdf.addPage();
+          pdf.addImage(imgData, 'PNG', margin, position, printWidth, printHeight);
+          heightLeft -= (pageHeight - (margin * 2));
+        }
+
+        pdf.save(`${baseFileName}_${Date.now()}.pdf`);
+      } catch (err) {
+        console.error("PDF Export Error:", err);
+        alert("PDF Generation Failed: " + err.message);
+      } finally {
+        // Restore styles
+        el.style.height = origHeight;
+        el.style.maxHeight = origMaxH;
+        el.style.overflow = "auto";
+        el.scrollTop = origScroll;
+      }
+    }
+
+    // =============================================================
+    // UNIVERSAL IMAGE EXPORT FUNCTION (PNG / JPG)
+    // =============================================================
+    async function exportElementAsImage(elementId, baseFileName, format = 'png') {
+      const el = document.getElementById(elementId);
+      if (!el) {
+        alert("No content available to export as image.");
+        return;
+      }
+
+      const origScroll = el.scrollTop;
+      const origHeight = el.style.height;
+      const origMaxH = el.style.maxHeight;
+
+      try {
+        el.style.height = "auto";
+        el.style.maxHeight = "none";
+        el.style.overflow = "visible";
+
+        const isJpg = format === 'jpg' || format === 'jpeg';
+        const mime = isJpg ? 'image/jpeg' : 'image/png';
+        const ext = isJpg ? 'jpg' : 'png';
+
+        const canvas = await html2canvas(el, {
+          scale: 2,
+          useCORS: true,
+          logging: false,
+          backgroundColor: '#0f172a'
+        });
+
+        const link = document.createElement('a');
+        link.download = `${baseFileName}_${Date.now()}.${ext}`;
+        link.href = canvas.toDataURL(mime, 0.95);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      } catch (err) {
+        console.error("Image Export Error:", err);
+        alert("Image Generation Failed: " + err.message);
+      } finally {
+        el.style.height = origHeight;
+        el.style.maxHeight = origMaxH;
+        el.style.overflow = "auto";
+        el.scrollTop = origScroll;
+      }
+    }
+
+    function switchTab(name, evt) {
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+      document.querySelectorAll('.tab-pane').forEach(pane => pane.style.display = 'none');
+      if (evt && evt.target) evt.target.classList.add('active');
+      const target = document.getElementById('tab-' + name);
+      if (target) target.style.display = 'block';
+    }
+
+    function startNewSession() {
+      if (isIncognito) {
+        isIncognito = false;
+        document.body.classList.remove('incognito-theme');
+        document.getElementById('brandIcon').innerText = '🛡️';
+        document.getElementById('brandText').innerText = 'HealthLens AI';
+        document.getElementById('sidebarTitle').innerText = 'Diagnostic Records';
+        document.getElementById('modelBadge').innerHTML = '<span>●</span> gemini-3.6-flash Active';
+      }
+      currentSessionId = null;
+      chatHistory = [];
+      mappedPainData = null;
+      document.getElementById('activePainBadges').style.display = 'none';
+      document.getElementById('chatBox').innerHTML = `<div class="msg msg-assistant">Hello! I am HealthLens AI assistant. Ask any question regarding diagnoses, scans, medications, or lab panels.</div>`;
+      document.getElementById('symResult').style.display = 'none';
+      document.getElementById('scanResult').style.display = 'none';
+      document.getElementById('rxResult').style.display = 'none';
+      document.getElementById('coughResult').style.display = 'none';
+      document.getElementById('symText').value = '';
+      if (window.innerWidth <= 768) toggleSidebar();
+    }
+
+    function enterIncognitoMode() {
+      isIncognito = true;
+      currentSessionId = null;
+      chatHistory = [];
+      document.body.classList.add('incognito-theme');
+      document.getElementById('brandIcon').innerText = '🕶️';
+      document.getElementById('brandText').innerText = 'HealthLens Incognito';
+      document.getElementById('sidebarTitle').innerText = 'Incognito (Unsaved)';
+      document.getElementById('modelBadge').innerHTML = '<span>🕶️</span> Incognito Mode Active';
+      document.getElementById('chatBox').innerHTML = `<div class="msg msg-assistant">🕶️ <b>Incognito session active.</b> No symptoms, body maps, audio coughs, or radiology records will be saved.</div>`;
+      if (window.innerWidth <= 768) toggleSidebar();
+    }
+
+    // -------------------------------------------------------------
+    // History Persistence & Click-to-Open
+    // -------------------------------------------------------------
+    async function loadHistory() {
+      if (!currentUser) {
+        renderHistoryList(JSON.parse(localStorage.getItem('guest_sessions') || '[]'));
+        return;
+      }
+      try {
+        const res = await fetch(`/api/history?email=${encodeURIComponent(currentUser.email)}`);
+        const json = await res.json();
+        if (json.status === 'success') {
+          renderHistoryList(json.sessions);
+        }
+      } catch (err) {
+        console.error("Failed to load history:", err);
+      }
+    }
+
+    function renderHistoryList(sessions) {
+      const container = document.getElementById('historyList');
+      if (!sessions || sessions.length === 0) {
+        container.innerHTML = `<div style="text-align: center; color: #64748b; font-size: 0.8rem; margin-top: 2rem;">No clinical sessions yet</div>`;
+        return;
+      }
+
+      container.innerHTML = sessions.map(s => {
+        const icon = s.type === 'chat' ? '💬' : s.type === 'scans' ? '🩻' : s.type === 'rx' ? '📋' : s.type === 'audio' ? '🎙️' : '🩺';
+        const activeClass = s.id === currentSessionId ? 'active' : '';
+        return `
+          <div class="history-item ${activeClass}" onclick="openSession('${s.id}')">
+            <div style="display:flex; align-items:center; gap:0.4rem; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
+              <span>${icon}</span>
+              <span title="${s.title}">${s.title}</span>
+            </div>
+            <button class="history-del-btn" onclick="deleteSession('${s.id}', event)">🗑️</button>
+          </div>
+        `;
+      }).join('');
+    }
+
+    async function openSession(id) {
+      currentSessionId = id;
+
+      if (!currentUser) {
+        const guests = JSON.parse(localStorage.getItem('guest_sessions') || '[]');
+        const sess = guests.find(x => x.id === id);
+        if (sess) restoreSessionData(sess);
+        return;
+      }
+
+      try {
+        const res = await fetch(`/api/history/${id}?email=${encodeURIComponent(currentUser.email)}`);
+        const json = await res.json();
+        if (json.status === 'success' && json.session) {
+          restoreSessionData(json.session);
+        }
+      } catch (e) {
+        alert("Failed to load session: " + e.message);
+      }
+      if (window.innerWidth <= 768) toggleSidebar();
+    }
+
+    const restoreSession = openSession;
+
+    function restoreSessionData(session) {
+      const type = session.type;
+      const tabName = type === 'scans' ? 'scans' : type === 'rx' ? 'rx' : type === 'audio' ? 'audio' : type === 'chat' ? 'chat' : 'symptoms';
+      switchTab(tabName);
+
+      document.querySelectorAll('.tab-btn').forEach((b, idx) => {
+        const matches = (idx === 0 && tabName === 'symptoms') ||
+                        (idx === 1 && tabName === 'scans') ||
+                        (idx === 2 && tabName === 'rx') ||
+                        (idx === 3 && tabName === 'audio') ||
+                        (idx === 4 && tabName === 'chat');
+        b.classList.toggle('active', matches);
+      });
+
+      if (type === 'chat') {
+        chatHistory = session.data || [];
+        const box = document.getElementById('chatBox');
+        box.innerHTML = '';
+        chatHistory.forEach(m => appendChat(m.role === 'user' ? 'user' : 'assistant', m.content));
+      } else if (type === 'symptoms') {
+        renderSymptomOutput(session.data);
+        document.getElementById('symResult').style.display = 'block';
+      } else if (type === 'scans') {
+        renderScanOutput(session.data);
+        document.getElementById('scanResult').style.display = 'block';
+      }
+      loadHistory();
+    }
+
+    async function deleteSession(id, evt) {
+      evt.stopPropagation();
+      if (!confirm("Delete this consultation record?")) return;
+
+      if (!currentUser) {
+        let guests = JSON.parse(localStorage.getItem('guest_sessions') || '[]');
+        guests = guests.filter(x => x.id !== id);
+        localStorage.setItem('guest_sessions', JSON.stringify(guests));
+        renderHistoryList(guests);
+        if (currentSessionId === id) startNewSession();
+        return;
+      }
+
+      try {
+        await fetch(`/api/history/${id}?email=${encodeURIComponent(currentUser.email)}`, { method: 'DELETE' });
+        if (currentSessionId === id) startNewSession();
+        loadHistory();
+      } catch (err) {
+        alert("Delete failed: " + err.message);
+      }
+    }
+
+    async function syncSession(title, type, data) {
+      if (isIncognito) return;
+
+      if (!currentUser) {
+        let guests = JSON.parse(localStorage.getItem('guest_sessions') || '[]');
+        const id = currentSessionId || ('g_' + Math.random().toString(36).substring(2, 8));
+        currentSessionId = id;
+        const existing = guests.find(x => x.id === id);
+        if (existing) {
+          existing.title = title;
+          existing.data = data;
+        } else {
+          guests.unshift({ id, title, type, data, created_at: 'Just now' });
+        }
+        localStorage.setItem('guest_sessions', JSON.stringify(guests));
+        renderHistoryList(guests);
+        return;
+      }
+
+      try {
+        const res = await fetch('/api/history/save', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email: currentUser.email,
+            id: currentSessionId,
+            title,
+            type,
+            data
+          })
+        });
+        const json = await res.json();
+        if (json.status === 'success') {
+          currentSessionId = json.id;
+          loadHistory();
+        }
+      } catch (e) {
+        console.error("History sync error:", e);
+      }
+    }
+
+    // -------------------------------------------------------------
+    // AI Chat with Lock, Cancel & Multi-Format Download
+    // -------------------------------------------------------------
+    function appendChat(role, text) {
+      const box = document.getElementById('chatBox');
+      const el = document.createElement('div');
+      el.className = 'msg msg-' + role;
+      el.innerText = text;
+      box.appendChild(el);
+      box.scrollTop = box.scrollHeight;
+      return el;
+    }
+
+    function cancelChatStream() {
+      if (chatAbortController) {
+        chatAbortController.abort();
+        chatAbortController = null;
+      }
+    }
+
+    async function handleChatSubmit(e) {
+      e.preventDefault();
+      const input = document.getElementById('chatInput');
+      const sendBtn = document.getElementById('chatSendBtn');
+      const cancelBtn = document.getElementById('chatCancelBtn');
+      const text = input.value.trim();
+      if (!text) return;
+
+      input.value = "";
+      input.disabled = true;
+      sendBtn.disabled = true;
+      cancelBtn.style.display = "inline-flex";
+
+      appendChat('user', text);
+      chatHistory.push({ role: 'user', content: text });
+
+      const assistantMsg = appendChat('assistant', 'Consulting diagnostic engine...');
+      chatAbortController = new AbortController();
+
+      try {
+        const res = await fetch('/api/chat/stream', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ messages: chatHistory }),
+          signal: chatAbortController.signal
+        });
+
+        if (!res.ok || !res.body) throw new Error("Stream connection failed");
+
+        const reader = res.body.getReader();
+        const decoder = new TextDecoder();
+        let full = "";
+        let buffer = "";
+
+        while (true) {
+          const result = await reader.read();
+          if (result.done) break;
+
+          buffer += decoder.decode(result.value, { stream: true });
+          const lines = buffer.split('\n');
+          buffer = lines.pop();
+
+          for (let i = 0; i < lines.length; i++) {
+            const line = lines[i].trim();
+            if (line.indexOf('data: ') === 0) {
+              const payload = line.replace('data: ', '').trim();
+              if (payload === '[DONE]') break;
+
+              try {
+                const parsed = JSON.parse(payload);
+                if (parsed.text) {
+                  if (full === "") assistantMsg.innerText = "";
+                  full += parsed.text;
+                  assistantMsg.innerText = full;
+                }
+              } catch (err) {}
+            }
+          }
+        }
+
+        if (full) {
+          chatHistory.push({ role: 'model', content: full });
+          if (!isIncognito) {
+            const chatTitle = chatHistory[0].content.substring(0, 24) + "...";
+            syncSession(chatTitle, 'chat', chatHistory);
+          }
+        }
+      } catch (err) {
+        if (err.name === 'AbortError') {
+          assistantMsg.innerHTML += '<br><span style="color: #ef4444; font-size: 0.8rem;">[⏹ Generation stopped by user]</span>';
+        } else {
+          assistantMsg.innerHTML = '<span style="color: #ef4444;">⚠️ Connection Error: ' + err.message + '</span>';
+        }
+      } finally {
+        chatAbortController = null;
+        input.disabled = false;
+        sendBtn.disabled = false;
+        cancelBtn.style.display = "none";
+        input.focus();
+      }
+    }
+
+    // -------------------------------------------------------------
+    // Feature: Point to the Pain Dialog
+    // -------------------------------------------------------------
+    function openBodyMapModal() {
+      document.getElementById('bodyMapModal').style.display = 'flex';
+    }
+
+    function closeBodyMapModal() {
+      document.getElementById('bodyMapModal').style.display = 'none';
+    }
+
+    function initBodyMapInteractions() {
+      document.querySelectorAll('.body-zone').forEach(zone => {
+        zone.addEventListener('click', (e) => {
+          document.querySelectorAll('.body-zone').forEach(z => z.classList.remove('selected'));
+          e.target.classList.add('selected');
+          selectedZone = e.target.getAttribute('data-zone');
+          document.getElementById('dialogZoneName').innerText = selectedZone;
+        });
+      });
+    }
+
+    function applyPainZoneToForm() {
+      if (!selectedZone) {
+        alert("Please tap on a body region first.");
+        return;
+      }
+      const sev = document.getElementById('painSlider').value;
+      const char = document.getElementById('painCharSelect').value;
+      const rad = document.getElementById('painRadiation').value.trim();
+
+      mappedPainData = {
+        region: selectedZone,
+        severity: parseInt(sev),
+        character: char,
+        radiation: rad || null
+      };
+
+      const badgeWrap = document.getElementById('activePainBadges');
+      const pills = document.getElementById('painPills');
+      pills.innerHTML = `
+        <span class="badge badge-emergency">📍 ${mappedPainData.region}</span>
+        <span class="badge badge-urgent">Severity: ${mappedPainData.severity}/10</span>
+        <span class="badge badge-mild">${mappedPainData.character}</span>
+        ${rad ? `<span class="badge badge-mild">Radiates: ${rad}</span>` : ''}
+      `;
+      badgeWrap.style.display = 'block';
+
+      const symInput = document.getElementById('symText');
+      if (!symInput.value.includes(mappedPainData.region)) {
+        symInput.value = `Patient reports ${mappedPainData.character.toLowerCase()} pain located at ${mappedPainData.region} (rated ${mappedPainData.severity}/10)${rad ? ', radiating to ' + rad : ''}. ` + symInput.value;
+      }
+
+      closeBodyMapModal();
+    }
+
+    // -------------------------------------------------------------
+    // Feature: Symptoms & Dual-Doctor Analysis
+    // -------------------------------------------------------------
+    async function handleSymptomSubmit(e) {
+      e.preventDefault();
+      const btn = document.getElementById('symBtn');
+      const resDiv = document.getElementById('symResult');
+      btn.disabled = true;
+      btn.innerText = "Analyzing Clinical Signs...";
+      resDiv.style.display = "none";
+
+      const symptoms = document.getElementById('symText').value;
+      const dualDoctor = document.getElementById('dualDoctorToggle').checked;
+
+      const payload = {
+        symptoms,
+        patient_age: document.getElementById('symAge').value || null,
+        patient_sex: document.getElementById('symSex').value || null,
+        body_regions: mappedPainData ? [mappedPainData.region] : null,
+        pain_severity: mappedPainData ? mappedPainData.severity : null,
+        pain_character: mappedPainData ? mappedPainData.character : null,
+        radiation: mappedPainData ? mappedPainData.radiation : null,
+        dual_doctor_mode: dualDoctor
+      };
+
+      try {
+        const res = await fetch('/api/symptoms/analyze', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        const text = await res.text();
+        let json = JSON.parse(text);
+        if (!res.ok) throw new Error(json.detail || "Analysis failed");
+
+        renderSymptomOutput(json.data);
+        resDiv.style.display = "block";
+
+        if (!isIncognito) {
+          const title = json.data.suspected_primary_condition || symptoms.substring(0, 24) + "...";
+          syncSession(title, 'symptoms', json.data);
+        }
+      } catch (err) {
+        alert("Triage Analysis Error: " + err.message);
+      } finally {
+        btn.disabled = false;
+        btn.innerText = "Run Comprehensive Assessment";
+      }
+    }
+
+    function renderSymptomOutput(d) {
+      currentHandoverData = d.paramedic_handover;
+      const urgencyClass = 'badge-' + (d.triage_urgency || '').toLowerCase().replace(/\s+/g, '-');
+
+      let dualDoctorHtml = '';
+      if (d.dual_doctor_debate && d.dual_doctor_debate.active) {
+        const deb = d.dual_doctor_debate;
+        dualDoctorHtml = `
+          <div style="margin-top: 1.2rem;">
+            <h4 style="color: var(--primary); font-size: 0.95rem; margin-bottom: 0.5rem;">⚖️ Dual-Doctor Consultation Debate</h4>
+            <div class="dual-doctor-grid">
+              <div class="doctor-card alpha">
+                <b style="color: #38bdf8;">Dr. Alpha (Conservative Internist)</b>
+                <p style="font-size: 0.82rem; margin-top: 0.35rem; line-height: 1.4;">${deb.dr_alpha_internist.evaluation}</p>
+                <div style="font-size: 0.75rem; color: #94a3b8; margin-top: 0.4rem;"><b>Approach:</b> ${deb.dr_alpha_internist.suggested_approach}</div>
+              </div>
+              <div class="doctor-card beta">
+                <b style="color: #ef4444;">Dr. Beta (Emergency Specialist)</b>
+                <p style="font-size: 0.82rem; margin-top: 0.35rem; line-height: 1.4;">${deb.dr_beta_emergency.evaluation}</p>
+                <div style="font-size: 0.75rem; color: #fca5a5; margin-top: 0.4rem;"><b>Worst-Case Rule Out:</b> ${deb.dr_beta_emergency.worst_case_rule_out}</div>
+              </div>
+            </div>
+            <div style="margin-top: 0.6rem; padding: 0.6rem 0.8rem; background: rgba(56, 189, 248, 0.08); border-radius: 8px; font-size: 0.82rem;">
+              <b>Consensus Resolution:</b> ${deb.consensus_resolution}
+            </div>
+          </div>
+        `;
+      }
+
+      let diffList = (d.differential_diagnoses || []).map(item => `<li><b>${item.disease_name}</b> (${item.likelihood}): ${item.matching_reasons}</li>`).join('');
+
+      document.getElementById('symResult').innerHTML = `
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+          <h3 style="color: var(--primary);">${d.suspected_primary_condition}</h3>
+          <span class="badge ${urgencyClass}">${d.triage_urgency}</span>
+        </div>
+        <p style="font-size: 0.9rem; line-height: 1.45; margin-bottom: 0.75rem;">${d.clinical_summary}</p>
+        ${dualDoctorHtml}
+        <h4 style="font-size: 0.85rem; color: var(--text-muted); margin-top: 1rem; margin-bottom: 0.3rem;">Differential Diagnoses</h4>
+        <ul style="padding-left: 1.2rem; font-size: 0.85rem;">${diffList}</ul>
+
+        <div style="margin-top: 1.2rem; display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center;">
+          <button type="button" class="btn btn-secondary" onclick="exportElementAsPdf('symResult', 'clinical_triage_report')" style="font-size: 0.82rem; padding: 0.55rem 0.85rem;">
+            📄 Download PDF
+          </button>
+          <button type="button" class="btn btn-secondary" onclick="exportElementAsImage('symResult', 'clinical_triage_image', 'png')" style="font-size: 0.82rem; padding: 0.55rem 0.85rem;">
+            🖼️ PNG
+          </button>
+          <button type="button" class="btn btn-secondary" onclick="exportElementAsImage('symResult', 'clinical_triage_image', 'jpg')" style="font-size: 0.82rem; padding: 0.55rem 0.85rem;">
+            🖼️ JPG
+          </button>
+          <button type="button" class="btn btn-alert" onclick="openParamedicModal()" style="font-size: 0.82rem; padding: 0.55rem 0.85rem;">
+            🚨 Paramedic Sheet
+          </button>
+        </div>
+      `;
+    }
+
+    // -------------------------------------------------------------
+    // Feature: Paramedic EMT Sheet Modal
+    // -------------------------------------------------------------
+    function openParamedicModal() {
+      if (!currentHandoverData) return;
+      const h = currentHandoverData;
+      document.getElementById('paramedicContent').innerHTML = `
+        <div><b>CHIEF COMPLAINT:</b> ${h.chief_complaint || 'N/A'}</div>
+        <div><b>MECHANISM / TRIGGERS:</b> ${h.mechanism_or_triggers || 'N/A'}</div>
+        <div><b>SIGNS & SYMPTOMS:</b> ${h.signs_and_symptoms || 'N/A'}</div>
+        <div style="color: #ef4444; font-weight: bold; margin-top: 0.4rem;">⚠️ RED FLAG ALERTS: ${h.red_flag_warnings || 'None noted'}</div>
+        <div style="color: #38bdf8; margin-top: 0.4rem;"><b>IMMEDIATE EMT INTERVENTIONS:</b> ${h.immediate_suggested_interventions || 'Supportive vitals monitoring'}</div>
+      `;
+
+      const qrData = encodeURIComponent(JSON.stringify({
+        complaint: h.chief_complaint,
+        red_flags: h.red_flag_warnings,
+        actions: h.immediate_suggested_interventions,
+        time: new Date().toISOString()
+      }));
+      document.getElementById('paramedicQr').src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${qrData}`;
+      document.getElementById('paramedicModal').style.display = 'flex';
+    }
+
+    function closeParamedicModal() {
+      document.getElementById('paramedicModal').style.display = 'none';
+    }
+
+    // -------------------------------------------------------------
+    // Feature: PACS Radiography & Windowing
+    // -------------------------------------------------------------
+    function handleScanFilesLoaded(e) {
+      const files = Array.from(e.target.files || []);
+      if (!files.length) return;
+
+      document.getElementById('fileLabel').innerText = `${files.length} slice(s) loaded into PACS viewer`;
+      pacsSlices = [];
+
+      files.forEach((file) => {
+        const url = URL.createObjectURL(file);
+        const img = new Image();
+        img.src = url;
+        img.onload = () => {
+          pacsSlices.push(img);
+          if (pacsSlices.length === files.length) {
+            document.getElementById('pacsContainer').style.display = 'flex';
+            const slider = document.getElementById('sliceSlider');
+            slider.max = pacsSlices.length - 1;
+            slider.value = 0;
+            currentSliceIdx = 0;
+            renderPacsSlice();
+          }
+        };
+      });
+    }
+
+    function onSliceChange(val) {
+      currentSliceIdx = parseInt(val);
+      renderPacsSlice();
+    }
+
+    function applyPacsWindow(preset) {
+      activeFilter = preset;
+      renderPacsSlice();
+    }
+
+    function renderPacsSlice() {
+      if (!pacsSlices.length) return;
+      const canvas = document.getElementById('pacsCanvas');
+      const ctx = canvas.getContext('2d');
+      const img = pacsSlices[currentSliceIdx];
+
+      canvas.width = img.naturalWidth || 512;
+      canvas.height = img.naturalHeight || 512;
+
+      if (activeFilter === 'bone') {
+        ctx.filter = 'contrast(240%) brightness(120%)';
+      } else if (activeFilter === 'lung') {
+        ctx.filter = 'contrast(180%) brightness(140%) grayscale(100%)';
+      } else if (activeFilter === 'brain') {
+        ctx.filter = 'contrast(130%) brightness(95%)';
+      } else if (activeFilter === 'invert') {
+        ctx.filter = 'invert(100%) contrast(150%)';
+      } else {
+        ctx.filter = 'contrast(115%) brightness(105%)';
+      }
+
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      document.getElementById('sliceCounter').innerText = `Slice: ${currentSliceIdx + 1} / ${pacsSlices.length} [Preset: ${activeFilter.toUpperCase()}]`;
+    }
+
+    async function handleScanSubmit(e) {
+      e.preventDefault();
+      const fileInput = document.getElementById('scanFile');
+      if (!fileInput.files.length) return alert("Upload at least 1 scan image.");
+
+      const btn = document.getElementById('scanBtn');
+      const resDiv = document.getElementById('scanResult');
+      btn.disabled = true;
+      btn.innerText = "Evaluating Imaging Slices...";
+      resDiv.style.display = "none";
+
+      const fd = new FormData();
+      Array.from(fileInput.files).forEach(f => fd.append('files', f));
+      fd.append('confirmed_body_part', document.getElementById('scanRegion').value);
+      fd.append('symptoms', document.getElementById('scanSymptoms').value);
+
+      try {
+        const res = await fetch('/api/scan/analyze', { method: 'POST', body: fd });
+        const text = await res.text();
+        const json = JSON.parse(text);
+        if (!res.ok) throw new Error(json.detail || "Scan failed");
+
+        renderScanOutput(json.data);
+        resDiv.style.display = "block";
+      } catch (err) {
+        alert("Radiology Error: " + err.message);
+      } finally {
+        btn.disabled = false;
+        btn.innerText = "Evaluate Radiology Slices";
+      }
+    }
+
+    function renderScanOutput(d) {
+      const sevClass = 'badge-' + (d.severity_level || '').toLowerCase();
+      let findingsList = (d.detailed_radiological_findings || []).map(item => `<li>${item}</li>`).join('');
+
+      document.getElementById('scanResult').innerHTML = `
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+          <h3 style="color: var(--primary);">${d.suspected_disease}</h3>
+          <span class="badge ${sevClass}">${d.severity_level}</span>
+        </div>
+        <p style="font-size: 0.9rem; margin-bottom: 0.75rem;">${d.simplified_explanation}</p>
+        <h4 style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.3rem;">Radiological Findings</h4>
+        <ul style="padding-left: 1.2rem; font-size: 0.85rem;">${findingsList}</ul>
+
+        <div style="margin-top: 1.2rem; display: flex; gap: 0.5rem; flex-wrap: wrap;">
+          <button type="button" class="btn btn-secondary" onclick="exportElementAsPdf('scanResult', 'radiology_scan_report')" style="font-size: 0.82rem; padding: 0.55rem 0.85rem;">
+            📄 Download PDF
+          </button>
+          <button type="button" class="btn btn-secondary" onclick="exportElementAsImage('scanResult', 'radiology_scan_image', 'png')" style="font-size: 0.82rem; padding: 0.55rem 0.85rem;">
+            🖼️ PNG
+          </button>
+          <button type="button" class="btn btn-secondary" onclick="exportElementAsImage('scanResult', 'radiology_scan_image', 'jpg')" style="font-size: 0.82rem; padding: 0.55rem 0.85rem;">
+            🖼️ JPG
+          </button>
+        </div>
+      `;
+    }
+
+    // -------------------------------------------------------------
+    // Feature: Prescription & Lab Report Decoder (OCR)
+    // -------------------------------------------------------------
+    let selectedRxFile = null;
+    function handleRxFileSelected(e) {
+      if (e.target.files && e.target.files[0]) {
+        selectedRxFile = e.target.files[0];
+        document.getElementById('rxLabel').innerText = `Selected: ${selectedRxFile.name}`;
+      }
+    }
+
+    async function submitRxDecoder() {
+      if (!selectedRxFile) return alert("Select a prescription or lab report image first.");
+      const btn = document.getElementById('rxBtn');
+      const resDiv = document.getElementById('rxResult');
+      btn.disabled = true;
+      btn.innerText = "Transcribing Handwriting & Decoding Panels...";
+      resDiv.style.display = "none";
+
+      const fd = new FormData();
+      fd.append('file', selectedRxFile);
+
+      try {
+        const res = await fetch('/api/prescription/analyze', { method: 'POST', body: fd });
+        const text = await res.text();
+        const json = JSON.parse(text);
+        if (!res.ok) throw new Error(json.detail || "Rx decode failed");
+
+        const d = json.data;
+        let medsTable = '';
+        if (d.extracted_medications && d.extracted_medications.length) {
+          medsTable = `
+            <h4 style="color: var(--primary); margin-top: 1rem; margin-bottom: 0.4rem;">💊 Decoded Medications & Dosing Schedule</h4>
+            <div style="overflow-x: auto;">
+              <table style="width: 100%; border-collapse: collapse; font-size: 0.84rem;">
+                <tr style="background: rgba(56, 189, 248, 0.15); text-align: left;">
+                  <th style="padding: 6px;">Medication</th>
+                  <th style="padding: 6px;">Dosage</th>
+                  <th style="padding: 6px;">Frequency</th>
+                  <th style="padding: 6px;">Instructions</th>
+                </tr>
+                ${d.extracted_medications.map(m => `
+                  <tr style="border-bottom: 1px solid var(--card-border);">
+                    <td style="padding: 6px; font-weight: bold;">${m.name}</td>
+                    <td style="padding: 6px;">${m.dosage}</td>
+                    <td style="padding: 6px; color: var(--primary);">${m.frequency}</td>
+                    <td style="padding: 6px;">${m.plain_instructions}</td>
+                  </tr>
+                `).join('')}
+              </table>
+            </div>
+          `;
+        }
+
+        let labsTable = '';
+        if (d.lab_results_panel && d.lab_results_panel.length) {
+          labsTable = `
+            <h4 style="color: var(--primary); margin-top: 1.2rem; margin-bottom: 0.4rem;">🧪 Pathology Lab Reference Ranges</h4>
+            <div style="overflow-x: auto;">
+              <table style="width: 100%; border-collapse: collapse; font-size: 0.84rem;">
+                <tr style="background: rgba(255, 255, 255, 0.05); text-align: left;">
+                  <th style="padding: 6px;">Test</th>
+                  <th style="padding: 6px;">Value</th>
+                  <th style="padding: 6px;">Ref Range</th>
+                  <th style="padding: 6px;">Status</th>
+                </tr>
+                ${d.lab_results_panel.map(l => {
+                  const badgeClass = l.status === 'Critical' ? 'badge-critical' : l.status === 'Borderline' ? 'badge-borderline' : 'badge-normal';
+                  return `
+                    <tr style="border-bottom: 1px solid var(--card-border);">
+                      <td style="padding: 6px; font-weight: bold;">${l.test_name}</td>
+                      <td style="padding: 6px;">${l.observed_value}</td>
+                      <td style="padding: 6px; color: #94a3b8;">${l.standard_range}</td>
+                      <td style="padding: 6px;"><span class="badge ${badgeClass}">${l.status}</span></td>
+                    </tr>
+                  `;
+                }).join('')}
+              </table>
+            </div>
+          `;
+        }
+
+        resDiv.innerHTML = `
+          <h3 style="color: var(--primary);">${d.document_type || 'Prescription / Lab Decode'}</h3>
+          <p style="font-size: 0.88rem; margin: 0.5rem 0;">${d.clinical_summary || ''}</p>
+          ${medsTable}
+          ${labsTable}
+
+          <div style="margin-top: 1.2rem; display: flex; gap: 0.5rem; flex-wrap: wrap;">
+            <button type="button" class="btn btn-secondary" onclick="exportElementAsPdf('rxResult', 'rx_lab_report')" style="font-size: 0.82rem; padding: 0.55rem 0.85rem;">
+              📄 Download PDF
+            </button>
+            <button type="button" class="btn btn-secondary" onclick="exportElementAsImage('rxResult', 'rx_lab_image', 'png')" style="font-size: 0.82rem; padding: 0.55rem 0.85rem;">
+              🖼️ PNG
+            </button>
+            <button type="button" class="btn btn-secondary" onclick="exportElementAsImage('rxResult', 'rx_lab_image', 'jpg')" style="font-size: 0.82rem; padding: 0.55rem 0.85rem;">
+              🖼️ JPG
+            </button>
+          </div>
+        `;
+        resDiv.style.display = "block";
+      } catch (err) {
+        alert("Rx Decode Error: " + err.message);
+      } finally {
+        btn.disabled = false;
+        btn.innerText = "Decode Medications & Lab Biomarkers";
+      }
+    }
+
+    // -------------------------------------------------------------
+    // Feature: Acoustic Cough & Wheeze Analyzer
+    // -------------------------------------------------------------
+    let mediaRecorder = null;
+    let audioChunks = [];
+    let isRecording = false;
+
+    async function toggleAudioRecording() {
+      const btn = document.getElementById('recordBtn');
+      const status = document.getElementById('recordStatus');
+      const resDiv = document.getElementById('coughResult');
+
+      if (isRecording) return;
+
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        mediaRecorder = new MediaRecorder(stream);
+        audioChunks = [];
+
+        mediaRecorder.ondataavailable = (e) => audioChunks.push(e.data);
+        mediaRecorder.onstop = async () => {
+          isRecording = false;
+          btn.style.transform = "scale(1)";
+          status.innerText = "Processing Acoustic Audio Markers...";
+
+          const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+          const fd = new FormData();
+          fd.append('file', audioBlob, 'cough_sample.webm');
+
+          try {
+            const res = await fetch('/api/audio/analyze', { method: 'POST', body: fd });
+            const text = await res.text();
+            const json = JSON.parse(text);
+            if (!res.ok) throw new Error(json.detail || "Audio analysis failed");
+
+            const d = json.data;
+            const sevClass = 'badge-' + (d.severity_grade || '').toLowerCase();
+
+            resDiv.innerHTML = `
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem;">
+                <h3 style="color: var(--primary); font-size: 1.15rem;">${d.sound_classification}</h3>
+                <span class="badge ${sevClass}">${d.severity_grade}</span>
+              </div>
+              <div style="display: flex; gap: 0.5rem; margin-bottom: 0.8rem;">
+                <span class="badge ${d.audible_wheeze ? 'badge-critical' : 'badge-normal'}">Wheeze: ${d.audible_wheeze ? 'DETECTED' : 'None'}</span>
+                <span class="badge ${d.audible_stridor ? 'badge-critical' : 'badge-normal'}">Stridor: ${d.audible_stridor ? 'DETECTED' : 'None'}</span>
+              </div>
+              <p style="font-size: 0.88rem; line-height: 1.45; margin-bottom: 0.5rem;"><b>Pulmonary Guidance:</b> ${d.home_care_and_action}</p>
+              <h4 style="font-size: 0.82rem; color: var(--text-muted);">Differential Pulmonary Conditions:</h4>
+              <ul style="padding-left: 1.2rem; font-size: 0.84rem; margin-top: 0.25rem;">
+                ${(d.differential_pulmonary_causes || []).map(c => `<li>${c}</li>`).join('')}
+              </ul>
+
+              <div style="margin-top: 1.2rem; display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                <button type="button" class="btn btn-secondary" onclick="exportElementAsPdf('coughResult', 'acoustic_cough_report')" style="font-size: 0.82rem; padding: 0.55rem 0.85rem;">
+                  📄 Download PDF
+                </button>
+                <button type="button" class="btn btn-secondary" onclick="exportElementAsImage('coughResult', 'acoustic_cough_image', 'png')" style="font-size: 0.82rem; padding: 0.55rem 0.85rem;">
+                  🖼️ PNG
+                </button>
+                <button type="button" class="btn btn-secondary" onclick="exportElementAsImage('coughResult', 'acoustic_cough_image', 'jpg')" style="font-size: 0.82rem; padding: 0.55rem 0.85rem;">
+                  🖼️ JPG
+                </button>
+              </div>
+            `;
+            resDiv.style.display = "block";
+            status.innerText = "Analysis Complete! Tap to record another sample.";
+          } catch (err) {
+            status.innerText = "Analysis failed: " + err.message;
+          }
+        };
+
+        mediaRecorder.start();
+        isRecording = true;
+        btn.style.transform = "scale(1.12)";
+
+        let countdown = 5;
+        status.innerText = `Recording cough/wheeze... ${countdown}s remaining`;
+        const timer = setInterval(() => {
+          countdown--;
+          if (countdown > 0) {
+            status.innerText = `Recording cough/wheeze... ${countdown}s remaining`;
+          } else {
+            clearInterval(timer);
+            mediaRecorder.stop();
+            stream.getTracks().forEach(t => t.stop());
+          }
+        }, 1000);
+
+      } catch (err) {
+        alert("Microphone access denied: " + err.message);
+      }
+    }
+
+    // -------------------------------------------------------------
+    // Auth Handlers
+    // -------------------------------------------------------------
+    function updateUserUI() {
+      const avatar = document.getElementById('userAvatar');
+      const label = document.getElementById('userLabel');
+      const sub = document.getElementById('userSub');
+      const btn = document.getElementById('authActionBtn');
+
+      if (currentUser) {
+        avatar.innerText = currentUser.email.charAt(0).toUpperCase();
+        label.innerText = currentUser.email.split('@')[0];
+        sub.innerText = "Synced Account";
+        btn.innerText = "🚪";
+      } else {
+        avatar.innerText = "?";
+        label.innerText = "Guest Mode";
+        sub.innerText = "Click to Sign In";
+        btn.innerText = "🔑";
+      }
+    }
+
+    function openAuthModal() { document.getElementById('authModal').style.display = 'flex'; }
+    function closeAuthModal() { document.getElementById('authModal').style.display = 'none'; }
+    function handleAuthAction() {
+      if (currentUser) {
+        if (confirm("Sign out?")) {
+          localStorage.removeItem('healthlens_user');
+          currentUser = null;
+          updateUserUI();
+          loadHistory();
+        }
+      } else {
+        openAuthModal();
+      }
+    }
+
+    async function handleAuthSubmit(e) {
+      e.preventDefault();
+      const email = document.getElementById('authEmail').value.trim();
+      const password = document.getElementById('authPassword').value;
+      try {
+        const res = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+        const json = await res.json();
+        if (!res.ok) throw new Error(json.detail || "Login failed");
+        currentUser = { email };
+        localStorage.setItem('healthlens_user', JSON.stringify(currentUser));
+        updateUserUI();
+        closeAuthModal();
+        loadHistory();
+      } catch (err) {
+        alert("Auth Error: " + err.message);
+      }
+    }
+  </script>
+</body>
+</html>
