@@ -1,9 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta name="google-site-verification" content="ffUsY4wHfPUKgGSKGT2kXW5-v7i9mK92b82mXq1KQtg" />
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>HealthLens AI - Comprehensive Clinical Diagnostic Suite</title>
   <link rel="manifest" href="/manifest.json" />
   <meta name="theme-color" content="#0284c7" />
@@ -46,12 +45,14 @@
       margin: 0;
       padding: 0;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      -webkit-tap-highlight-color: transparent;
     }
 
     body {
       background: radial-gradient(circle at top, #131d33 0%, #090d16 100%);
       color: var(--text);
       min-height: 100vh;
+      min-height: 100dvh;
       display: flex;
       overflow-x: hidden;
       transition: background 0.4s ease;
@@ -61,9 +62,13 @@
       display: flex;
       width: 100vw;
       min-height: 100vh;
+      min-height: 100dvh;
+      position: relative;
     }
 
-    /* Sidebar */
+    /* =========================================================
+       Desktop Sidebar Default (Untouched)
+       ========================================================= */
     .sidebar {
       width: var(--sidebar-width);
       background: var(--sidebar-bg);
@@ -71,8 +76,12 @@
       display: flex;
       flex-direction: column;
       flex-shrink: 0;
-      transition: transform 0.3s ease, background 0.4s ease;
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), background 0.4s ease;
       z-index: 100;
+    }
+
+    .sidebar-overlay {
+      display: none;
     }
 
     .sidebar-header {
@@ -221,7 +230,9 @@
       display: flex;
       flex-direction: column;
       height: 100vh;
+      height: 100dvh;
       overflow-y: auto;
+      min-width: 0;
     }
 
     header {
@@ -364,11 +375,6 @@
       gap: 1rem;
     }
 
-    @media (max-width: 640px) {
-      .grid-2 { grid-template-columns: 1fr; }
-      .header-right { gap: 0.4rem; }
-    }
-
     .btn {
       background: var(--btn-grad);
       color: #fff;
@@ -475,7 +481,6 @@
       border: 1px solid var(--success);
     }
 
-    /* Platform Choice Cards */
     .platform-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -599,7 +604,7 @@
       display: none;
       align-items: center;
       justify-content: center;
-      z-index: 200;
+      z-index: 2000;
       padding: 1rem;
     }
 
@@ -649,9 +654,125 @@
       color: var(--text);
     }
 
-    @keyframes slideUp {
-      from { opacity: 0; transform: translateY(12px); }
-      to { opacity: 1; transform: translateY(0); }
+    /* =========================================================
+       SPECIFIC MOBILE & ANDROID RESPONSIVE RULES (≤ 768px)
+       Desktop (>768px) is 100% unaffected
+       ========================================================= */
+    @media (max-width: 768px) {
+      .sidebar {
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        bottom: 0 !important;
+        height: 100vh !important;
+        height: 100dvh !important;
+        width: 78vw !important;
+        max-width: 300px !important;
+        min-width: 250px !important;
+        transform: translateX(-105%) !important;
+        z-index: 1000 !important;
+        box-shadow: none;
+        transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1) !important;
+      }
+
+      .sidebar.open {
+        transform: translateX(0) !important;
+        box-shadow: 10px 0 35px rgba(0, 0, 0, 0.75) !important;
+      }
+
+      .sidebar-overlay {
+        position: fixed !important;
+        inset: 0 !important;
+        background: rgba(0, 0, 0, 0.65) !important;
+        backdrop-filter: blur(4px) !important;
+        -webkit-backdrop-filter: blur(4px) !important;
+        z-index: 999 !important;
+        display: none;
+        opacity: 0;
+        transition: opacity 0.28s ease;
+      }
+
+      .sidebar-overlay.active {
+        display: block !important;
+        opacity: 1 !important;
+      }
+
+      .main-wrapper {
+        width: 100% !important;
+        height: 100vh !important;
+        height: 100dvh !important;
+      }
+
+      header {
+        padding: 0.6rem 0.8rem !important;
+        gap: 0.35rem !important;
+      }
+
+      .brand {
+        font-size: 1rem !important;
+      }
+
+      #modelBadge {
+        display: none !important;
+      }
+
+      #platformDownloadBtn {
+        padding: 0.35rem 0.55rem !important;
+        font-size: 0.74rem !important;
+      }
+
+      #headerCreateAccountBtn {
+        padding: 0.35rem 0.6rem !important;
+        font-size: 0.74rem !important;
+      }
+
+      .container {
+        padding: 0.9rem 0.65rem !important;
+      }
+
+      .card {
+        padding: 1.15rem 0.9rem !important;
+        border-radius: 14px !important;
+      }
+
+      .tabs {
+        padding: 0.25rem !important;
+        gap: 0.25rem !important;
+      }
+
+      .tab-btn {
+        min-width: 115px !important;
+        font-size: 0.76rem !important;
+        padding: 0.55rem 0.4rem !important;
+      }
+
+      .grid-2 {
+        grid-template-columns: 1fr !important;
+        gap: 0.75rem !important;
+      }
+
+      .dual-doctor-grid {
+        grid-template-columns: 1fr !important;
+      }
+
+      .platform-grid {
+        grid-template-columns: 1fr !important;
+        gap: 0.75rem !important;
+      }
+
+      .modal-box {
+        padding: 1.3rem 1rem !important;
+        width: 95% !important;
+      }
+
+      .chat-box {
+        height: 48vh !important;
+        padding: 0.75rem !important;
+      }
+
+      .msg {
+        max-width: 92% !important;
+      }
     }
   </style>
 </head>
@@ -661,7 +782,7 @@
     <aside class="sidebar" id="sidebar">
       <div class="sidebar-header">
         <span style="font-weight: 800; color: var(--primary);" id="sidebarTitle">Diagnostic Records</span>
-        <button class="btn btn-secondary" onclick="toggleSidebar()" style="padding: 2px 6px; font-size: 0.8rem;">✕</button>
+        <button class="btn btn-secondary" onclick="toggleSidebar()" style="padding: 2px 8px; font-size: 0.85rem;">✕</button>
       </div>
 
       <div class="sidebar-actions">
@@ -689,11 +810,14 @@
       </div>
     </aside>
 
+    <!-- Mobile Dimming Backdrop Overlay -->
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
     <!-- Main Workspace -->
     <div class="main-wrapper">
       <header>
         <div class="header-left">
-          <button class="btn btn-secondary" onclick="toggleSidebar()" style="padding: 0.4rem 0.6rem;">☰</button>
+          <button class="btn btn-secondary" onclick="toggleSidebar()" style="padding: 0.4rem 0.6rem;" title="Toggle Records">☰</button>
           <div class="brand">
             <span id="brandIcon">🛡️</span> <span id="brandText">HealthLens AI</span>
           </div>
@@ -701,12 +825,12 @@
 
         <div class="header-right">
           <!-- App Download Platform Selector Button -->
-          <button type="button" class="btn btn-secondary" id="platformDownloadBtn" onclick="openPlatformModal()" style="padding: 0.4rem 0.75rem; font-size: 0.8rem;" title="Download HealthLens AI">
+          <button type="button" class="btn btn-secondary" id="platformDownloadBtn" onclick="openPlatformModal()" title="Download HealthLens AI">
             📱 Download App
           </button>
 
           <!-- Create Account Button -->
-          <button type="button" class="btn btn-create-acct" id="headerCreateAccountBtn" onclick="openAuthModal(true)" style="padding: 0.4rem 0.85rem; font-size: 0.8rem;">
+          <button type="button" class="btn btn-create-acct" id="headerCreateAccountBtn" onclick="openAuthModal(true)">
             ✨ Create Account
           </button>
 
@@ -732,7 +856,7 @@
              ============================================================== -->
         <section id="tab-symptoms" class="tab-pane">
           <div class="card">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem;">
               <div>
                 <h2 style="font-size: 1.25rem;">Triage & Anatomical Symptom Check</h2>
                 <p style="font-size: 0.85rem; color: var(--text-muted);">Pinpoint pain zones on the interactive body map or describe symptoms.</p>
@@ -805,7 +929,7 @@
                   <span style="font-size: 0.8rem; color: #94a3b8;" id="sliceCounter">Slice: 1/1</span>
                   <input type="range" id="sliceSlider" min="0" max="0" value="0" style="flex: 1; cursor: pointer;" oninput="onSliceChange(this.value)" />
                 </div>
-                <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; justify-content: center;">
                   <button type="button" class="btn btn-secondary" style="padding: 0.35rem 0.75rem; font-size: 0.75rem;" onclick="applyPacsWindow('soft')">Soft Tissue</button>
                   <button type="button" class="btn btn-secondary" style="padding: 0.35rem 0.75rem; font-size: 0.75rem;" onclick="applyPacsWindow('bone')">Bone Window</button>
                   <button type="button" class="btn btn-secondary" style="padding: 0.35rem 0.75rem; font-size: 0.75rem;" onclick="applyPacsWindow('lung')">Lung Window</button>
@@ -911,9 +1035,7 @@
     </div>
   </div>
 
-  <!-- ==============================================================
-       Modal: Choose Platform (Windows vs Android)
-       ============================================================== -->
+  <!-- Modal: Choose Platform (Windows vs Android) -->
   <div class="modal-backdrop" id="platformModal">
     <div class="modal-box" style="max-width: 480px; text-align: center;">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem;">
@@ -921,7 +1043,7 @@
         <button type="button" class="btn btn-secondary" onclick="closePlatformModal()" style="padding: 2px 8px;">✕</button>
       </div>
       <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.4rem;">
-        Select your platform to install or download HealthLens AI directly to your device:
+        Select your platform to install HealthLens AI directly to your device:
       </p>
 
       <div class="platform-grid">
@@ -930,7 +1052,7 @@
           <div style="font-size: 2.8rem; margin-bottom: 0.5rem;">🪟</div>
           <b style="font-size: 1.05rem; color: #fff;">Windows PC</b>
           <p style="font-size: 0.76rem; color: var(--text-muted); margin: 0.4rem 0 0.8rem 0;">
-            Desktop Application for Windows 10 & 11
+            Desktop app for Windows 10 & 11
           </p>
           <button type="button" class="btn" style="width: 100%; font-size: 0.82rem; padding: 0.45rem 0.6rem;">
             Download for Windows
@@ -942,7 +1064,7 @@
           <div style="font-size: 2.8rem; margin-bottom: 0.5rem;">🤖</div>
           <b style="font-size: 1.05rem; color: #fff;">Android</b>
           <p style="font-size: 0.76rem; color: var(--text-muted); margin: 0.4rem 0 0.8rem 0;">
-            Mobile App for Android Phones & Tablets
+            Mobile app for Android phones & tablets
           </p>
           <button type="button" class="btn" style="width: 100%; font-size: 0.82rem; padding: 0.45rem 0.6rem;">
             Download for Android
@@ -950,7 +1072,6 @@
         </div>
       </div>
 
-      <!-- Contextual Platform Instructions / Alert Box -->
       <div id="platformInstallFeedback" style="display: none; text-align: left; font-size: 0.83rem; background: rgba(56, 189, 248, 0.08); border: 1px solid var(--primary); padding: 0.85rem 1rem; border-radius: 10px; line-height: 1.45;"></div>
     </div>
   </div>
@@ -1108,6 +1229,33 @@
     });
 
     // =============================================================
+    // RESPONSIVE SIDEBAR MOBILE CONTROLS
+    // =============================================================
+    function toggleSidebar() {
+      const sb = document.getElementById('sidebar');
+      const ov = document.getElementById('sidebarOverlay');
+      if (sb) {
+        sb.classList.toggle('open');
+        if (ov) {
+          if (sb.classList.contains('open')) {
+            ov.classList.add('active');
+          } else {
+            ov.classList.remove('active');
+          }
+        }
+      }
+    }
+
+    function closeSidebarMobile() {
+      if (window.innerWidth <= 768) {
+        const sb = document.getElementById('sidebar');
+        const ov = document.getElementById('sidebarOverlay');
+        if (sb) sb.classList.remove('open');
+        if (ov) ov.classList.remove('active');
+      }
+    }
+
+    // =============================================================
     // PLATFORM DOWNLOAD MODAL HANDLERS (WINDOWS vs ANDROID)
     // =============================================================
     function openPlatformModal() {
@@ -1136,9 +1284,8 @@
         } else {
           fb.innerHTML = `
             <b style="color: var(--primary);">🪟 Windows Installation Guide:</b><br>
-            1. In Google Chrome or Microsoft Edge on your PC, look at the right side of the address bar.<br>
-            2. Click the <b>Install App icon (🖥️ or ➕)</b>.<br>
-            3. Click <b>Install</b>. HealthLens AI will open in its own borderless desktop window and place a shortcut on your Desktop & Start Menu.
+            1. In Chrome or Edge on your PC, click the <b>Install App icon (🖥️ or ➕)</b> in the address bar.<br>
+            2. Click <b>Install</b>. HealthLens AI will open in its own borderless window and place a shortcut on your Desktop & Start Menu.
           `;
         }
       } else if (platform === 'android') {
@@ -1160,10 +1307,6 @@
           `;
         }
       }
-    }
-
-    function toggleSidebar() {
-      document.getElementById('sidebar').classList.toggle('open');
     }
 
     // =============================================================
@@ -1300,7 +1443,7 @@
       document.getElementById('rxResult').style.display = 'none';
       document.getElementById('coughResult').style.display = 'none';
       document.getElementById('symText').value = '';
-      if (window.innerWidth <= 768) toggleSidebar();
+      closeSidebarMobile();
     }
 
     function enterIncognitoMode() {
@@ -1313,7 +1456,7 @@
       document.getElementById('sidebarTitle').innerText = 'Incognito (Unsaved)';
       document.getElementById('modelBadge').innerHTML = '<span>🕶️</span> Incognito Mode Active';
       document.getElementById('chatBox').innerHTML = `<div class="msg msg-assistant">🕶️ <b>Incognito session active.</b> No symptoms, body maps, audio coughs, or radiology records will be saved.</div>`;
-      if (window.innerWidth <= 768) toggleSidebar();
+      closeSidebarMobile();
     }
 
     // -------------------------------------------------------------
@@ -1364,6 +1507,7 @@
         const guests = JSON.parse(localStorage.getItem('guest_sessions') || '[]');
         const sess = guests.find(x => x.id === id);
         if (sess) restoreSessionData(sess);
+        closeSidebarMobile();
         return;
       }
 
@@ -1376,7 +1520,7 @@
       } catch (e) {
         alert("Failed to load session: " + e.message);
       }
-      if (window.innerWidth <= 768) toggleSidebar();
+      closeSidebarMobile();
     }
 
     const restoreSession = openSession;
