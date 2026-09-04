@@ -292,6 +292,7 @@
       flex: 1;
     }
 
+    /* Desktop Navigation Tabs */
     .tabs {
       display: flex;
       background: rgba(15, 23, 42, 0.6);
@@ -300,7 +301,6 @@
       border: 1px solid var(--card-border);
       margin-bottom: 1.5rem;
       gap: 0.35rem;
-      overflow-x: auto;
     }
 
     .tab-btn {
@@ -317,6 +317,10 @@
       transition: all 0.25s;
       white-space: nowrap;
       text-align: center;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.4rem;
     }
 
     .tab-btn.active {
@@ -727,23 +731,60 @@
       }
 
       .container {
-        padding: 0.9rem 0.65rem !important;
+        padding: 0.85rem 0.65rem !important;
+      }
+
+      /* -------------------------------------------------------------
+         ZERO-SCROLL BALANCED 3+2 GRID FOR MOBILE TABS
+         ------------------------------------------------------------- */
+      .tabs {
+        display: grid !important;
+        grid-template-columns: repeat(6, 1fr) !important;
+        gap: 0.35rem !important;
+        overflow-x: visible !important;
+        padding: 0.35rem !important;
+        border-radius: 12px !important;
+        margin-bottom: 1.1rem !important;
+      }
+
+      .tab-btn {
+        min-width: 0 !important;
+        padding: 0.55rem 0.25rem !important;
+        font-size: 0.74rem !important;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        justify-content: center !important;
+        gap: 0.2rem !important;
+        white-space: normal !important;
+        line-height: 1.2 !important;
+        text-align: center !important;
+      }
+
+      /* Top row: 3 balanced buttons (each spans 2 of 6 columns) */
+      .tabs .tab-btn:nth-child(1),
+      .tabs .tab-btn:nth-child(2),
+      .tabs .tab-btn:nth-child(3) {
+        grid-column: span 2 !important;
+      }
+
+      /* Bottom row: 2 balanced buttons (each spans 3 of 6 columns) */
+      .tabs .tab-btn:nth-child(4),
+      .tabs .tab-btn:nth-child(5) {
+        grid-column: span 3 !important;
+      }
+
+      .tab-icon {
+        font-size: 1.15rem !important;
+      }
+
+      .tab-label {
+        font-weight: 700 !important;
       }
 
       .card {
         padding: 1.15rem 0.9rem !important;
         border-radius: 14px !important;
-      }
-
-      .tabs {
-        padding: 0.25rem !important;
-        gap: 0.25rem !important;
-      }
-
-      .tab-btn {
-        min-width: 115px !important;
-        font-size: 0.76rem !important;
-        padding: 0.55rem 0.4rem !important;
       }
 
       .grid-2 {
@@ -842,13 +883,30 @@
       </header>
 
       <main class="container">
-        <!-- Navigation Tabs -->
+        <!-- ==============================================================
+             Upper Diagnostic Dialog Tabs (Zero-Scroll on Android)
+             ============================================================== -->
         <div class="tabs">
-          <button class="tab-btn active" onclick="switchTab('symptoms', event)">🩺 Symptoms & Pain Map</button>
-          <button class="tab-btn" onclick="switchTab('scans', event)">🩻 PACS Radiography</button>
-          <button class="tab-btn" onclick="switchTab('rx', event)">📋 Rx & Lab Decoder</button>
-          <button class="tab-btn" onclick="switchTab('audio', event)">🎙️ Acoustic Cough AI</button>
-          <button class="tab-btn" onclick="switchTab('chat', event)">💬 Clinical Assistant</button>
+          <button class="tab-btn active" onclick="switchTab('symptoms', event)">
+            <span class="tab-icon">🩺</span>
+            <span class="tab-label">Symptoms & Pain</span>
+          </button>
+          <button class="tab-btn" onclick="switchTab('scans', event)">
+            <span class="tab-icon">🩻</span>
+            <span class="tab-label">PACS Scans</span>
+          </button>
+          <button class="tab-btn" onclick="switchTab('rx', event)">
+            <span class="tab-icon">📋</span>
+            <span class="tab-label">Rx & Labs</span>
+          </button>
+          <button class="tab-btn" onclick="switchTab('audio', event)">
+            <span class="tab-icon">🎙️</span>
+            <span class="tab-label">Cough AI</span>
+          </button>
+          <button class="tab-btn" onclick="switchTab('chat', event)">
+            <span class="tab-icon">💬</span>
+            <span class="tab-label">AI Assistant</span>
+          </button>
         </div>
 
         <!-- ==============================================================
@@ -1419,7 +1477,12 @@
     function switchTab(name, evt) {
       document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
       document.querySelectorAll('.tab-pane').forEach(pane => pane.style.display = 'none');
-      if (evt && evt.target) evt.target.classList.add('active');
+      if (evt && evt.currentTarget) {
+        evt.currentTarget.classList.add('active');
+      } else if (evt && evt.target) {
+        const closestBtn = evt.target.closest('.tab-btn');
+        if (closestBtn) closestBtn.classList.add('active');
+      }
       const target = document.getElementById('tab-' + name);
       if (target) target.style.display = 'block';
     }
