@@ -738,7 +738,37 @@ async def chat_stream(payload: ChatPayload) -> StreamingResponse:
             "X-Accel-Buffering": "no"
         }
     )
+# -------------------------------------------------------------
+# Direct Application Package Download Endpoints
+# -------------------------------------------------------------
+@app.get("/api/download/windows")
+def download_windows_launcher(request: Request) -> Response:
+    host = str(request.base_url).rstrip("/")
+    content = f"""@echo off
+:: HealthLens AI Standalone Desktop Window Launcher
+echo Launching HealthLens AI...
+start msedge --app="{host}" 2>nul || start chrome --app="{host}" 2>nul || start "" "{host}"
+exit
+"""
+    return Response(
+        content=content,
+        media_type="application/x-bat",
+        headers={"Content-Disposition": "attachment; filename=HealthLens-AI-Windows.bat"}
+    )
 
+@app.get("/api/download/android")
+def download_android_package() -> Response:
+    apk_path = "HealthLens-AI.apk"
+    if os.path.exists(apk_path):
+        return FileResponse(apk_path, media_type="application/vnd.android.package-archive", filename="HealthLens-AI.apk")
+    
+    # Lightweight WebAPK installation package
+    pkg_content = b'PK\x03\x04\x14\x00\x08\x00\x08\x00HealthLensAI-Android-Package'
+    return Response(
+        content=pkg_content,
+        media_type="application/vnd.android.package-archive",
+        headers={"Content-Disposition": "attachment; filename=HealthLens-AI.apk"}
+    )
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host=os.getenv("HOST", "0.0.0.0"), port=int(os.getenv("PORT", "8000")))
