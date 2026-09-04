@@ -66,9 +66,7 @@
       position: relative;
     }
 
-    /* =========================================================
-       Desktop Sidebar Default (Untouched)
-       ========================================================= */
+    /* Desktop Sidebar Default */
     .sidebar {
       width: var(--sidebar-width);
       background: var(--sidebar-bg);
@@ -485,11 +483,11 @@
       border: 1px solid var(--success);
     }
 
+    /* Platform Choice Cards */
     .platform-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 1rem;
-      margin-bottom: 1.2rem;
     }
 
     .platform-card {
@@ -734,9 +732,7 @@
         padding: 0.85rem 0.65rem !important;
       }
 
-      /* -------------------------------------------------------------
-         ZERO-SCROLL BALANCED 3+2 GRID FOR MOBILE TABS
-         ------------------------------------------------------------- */
+      /* Zero-Scroll Balanced 3+2 Grid on Android/Mobile */
       .tabs {
         display: grid !important;
         grid-template-columns: repeat(6, 1fr) !important;
@@ -761,14 +757,12 @@
         text-align: center !important;
       }
 
-      /* Top row: 3 balanced buttons (each spans 2 of 6 columns) */
       .tabs .tab-btn:nth-child(1),
       .tabs .tab-btn:nth-child(2),
       .tabs .tab-btn:nth-child(3) {
         grid-column: span 2 !important;
       }
 
-      /* Bottom row: 2 balanced buttons (each spans 3 of 6 columns) */
       .tabs .tab-btn:nth-child(4),
       .tabs .tab-btn:nth-child(5) {
         grid-column: span 3 !important;
@@ -883,9 +877,7 @@
       </header>
 
       <main class="container">
-        <!-- ==============================================================
-             Upper Diagnostic Dialog Tabs (Zero-Scroll on Android)
-             ============================================================== -->
+        <!-- Diagnostic Tabs -->
         <div class="tabs">
           <button class="tab-btn active" onclick="switchTab('symptoms', event)">
             <span class="tab-icon">🩺</span>
@@ -909,9 +901,7 @@
           </button>
         </div>
 
-        <!-- ==============================================================
-             Tab 1: Symptoms Check + Point-to-Pain Dialog
-             ============================================================== -->
+        <!-- Tab 1: Symptoms Check + Point-to-Pain Dialog -->
         <section id="tab-symptoms" class="tab-pane">
           <div class="card">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem;">
@@ -965,9 +955,7 @@
           </div>
         </section>
 
-        <!-- ==============================================================
-             Tab 2: CT / DICOM Radiography + PACS Slice Scrubber
-             ============================================================== -->
+        <!-- Tab 2: CT / DICOM Radiography + PACS Slice Scrubber -->
         <section id="tab-scans" class="tab-pane" style="display: none;">
           <div class="card">
             <h2 style="font-size: 1.2rem; margin-bottom: 0.4rem;">PACS Radiography Studio & Slice Scrubber</h2>
@@ -1014,9 +1002,7 @@
           </div>
         </section>
 
-        <!-- ==============================================================
-             Tab 3: Prescription & Lab Report Decoder (OCR)
-             ============================================================== -->
+        <!-- Tab 3: Prescription & Lab Report Decoder (OCR) -->
         <section id="tab-rx" class="tab-pane" style="display: none;">
           <div class="card">
             <h2 style="font-size: 1.2rem; margin-bottom: 0.4rem;">Prescription & Pathology Lab Decoder</h2>
@@ -1037,9 +1023,7 @@
           </div>
         </section>
 
-        <!-- ==============================================================
-             Tab 4: Acoustic Cough & Wheeze Analyzer
-             ============================================================== -->
+        <!-- Tab 4: Acoustic Cough & Wheeze Analyzer -->
         <section id="tab-audio" class="tab-pane" style="display: none;">
           <div class="card" style="text-align: center;">
             <h2 style="font-size: 1.25rem; margin-bottom: 0.4rem;">Acoustic Cough & Wheeze Sound Analyzer</h2>
@@ -1056,9 +1040,7 @@
           </div>
         </section>
 
-        <!-- ==============================================================
-             Tab 5: Chat Assistant with PDF & PNG / JPG Downloads
-             ============================================================== -->
+        <!-- Tab 5: Chat Assistant with PDF & PNG / JPG Downloads -->
         <section id="tab-chat" class="tab-pane" style="display: none;">
           <div class="card">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem; flex-wrap: wrap; gap: 0.5rem;">
@@ -1093,44 +1075,39 @@
     </div>
   </div>
 
-  <!-- Modal: Choose Platform (Windows vs Android) -->
+  <!-- Modal: Direct 1-Click Platform Download (Zero Guides) -->
   <div class="modal-backdrop" id="platformModal">
-    <div class="modal-box" style="max-width: 480px; text-align: center;">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem;">
-        <h3 style="color: var(--primary); font-size: 1.25rem;">Download HealthLens AI</h3>
+    <div class="modal-box" style="max-width: 440px; text-align: center;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.2rem;">
+        <h3 style="color: var(--primary); font-size: 1.2rem;">Download App</h3>
         <button type="button" class="btn btn-secondary" onclick="closePlatformModal()" style="padding: 2px 8px;">✕</button>
       </div>
-      <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.4rem;">
-        Select your platform to install HealthLens AI directly to your device:
-      </p>
 
       <div class="platform-grid">
-        <!-- Windows Selection -->
-        <div class="platform-card" onclick="selectPlatform('windows')">
-          <div style="font-size: 2.8rem; margin-bottom: 0.5rem;">🪟</div>
-          <b style="font-size: 1.05rem; color: #fff;">Windows PC</b>
-          <p style="font-size: 0.76rem; color: var(--text-muted); margin: 0.4rem 0 0.8rem 0;">
-            Desktop app for Windows 10 & 11
+        <!-- Windows 1-Click Download -->
+        <div class="platform-card" onclick="triggerWindowsDownload()">
+          <div style="font-size: 2.8rem; margin-bottom: 0.4rem;">🪟</div>
+          <b style="font-size: 1rem; color: #fff;">Windows PC</b>
+          <p style="font-size: 0.76rem; color: var(--text-muted); margin: 0.3rem 0 0.8rem 0;">
+            Standalone Desktop App (.bat)
           </p>
-          <button type="button" class="btn" style="width: 100%; font-size: 0.82rem; padding: 0.45rem 0.6rem;">
-            Download for Windows
+          <button type="button" class="btn" style="width: 100%; font-size: 0.82rem; padding: 0.5rem 0.6rem;">
+            ⬇️ Download Windows App
           </button>
         </div>
 
-        <!-- Android Selection -->
-        <div class="platform-card" onclick="selectPlatform('android')">
-          <div style="font-size: 2.8rem; margin-bottom: 0.5rem;">🤖</div>
-          <b style="font-size: 1.05rem; color: #fff;">Android</b>
-          <p style="font-size: 0.76rem; color: var(--text-muted); margin: 0.4rem 0 0.8rem 0;">
-            Mobile app for Android phones & tablets
+        <!-- Android 1-Click Download -->
+        <div class="platform-card" onclick="triggerAndroidDownload()">
+          <div style="font-size: 2.8rem; margin-bottom: 0.4rem;">🤖</div>
+          <b style="font-size: 1rem; color: #fff;">Android</b>
+          <p style="font-size: 0.76rem; color: var(--text-muted); margin: 0.3rem 0 0.8rem 0;">
+            Mobile App (.apk / 1-Tap)
           </p>
-          <button type="button" class="btn" style="width: 100%; font-size: 0.82rem; padding: 0.45rem 0.6rem;">
-            Download for Android
+          <button type="button" class="btn" style="width: 100%; font-size: 0.82rem; padding: 0.5rem 0.6rem;">
+            ⬇️ Download Android App
           </button>
         </div>
       </div>
-
-      <div id="platformInstallFeedback" style="display: none; text-align: left; font-size: 0.83rem; background: rgba(56, 189, 248, 0.08); border: 1px solid var(--primary); padding: 0.85rem 1rem; border-radius: 10px; line-height: 1.45;"></div>
     </div>
   </div>
 
@@ -1287,6 +1264,44 @@
     });
 
     // =============================================================
+    // DIRECT 1-CLICK PLATFORM DOWNLOADS (NO GUIDES)
+    // =============================================================
+    function openPlatformModal() {
+      document.getElementById('platformModal').style.display = 'flex';
+    }
+
+    function closePlatformModal() {
+      document.getElementById('platformModal').style.display = 'none';
+    }
+
+    function triggerWindowsDownload() {
+      closePlatformModal();
+      const host = window.location.origin;
+      const batScript = `@echo off\r\n:: HealthLens AI Desktop Window Launcher\r\necho Launching HealthLens AI...\r\nstart msedge --app="${host}" 2>nul || start chrome --app="${host}" 2>nul || start "" "${host}"\r\nexit\r\n`;
+      downloadFile('HealthLens-AI-Windows.bat', batScript, 'application/x-bat');
+    }
+
+    function triggerAndroidDownload() {
+      closePlatformModal();
+      // If browser PWA install is ready, trigger native 1-tap installation dialog immediately
+      if (deferredPrompt) {
+        deferredPrompt.prompt();
+        deferredPrompt.userChoice.then(() => {
+          deferredPrompt = null;
+        });
+        return;
+      }
+      
+      // Otherwise immediately initiate file download of the APK
+      const a = document.createElement('a');
+      a.href = '/api/download/android';
+      a.download = 'HealthLens-AI.apk';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    }
+
+    // =============================================================
     // RESPONSIVE SIDEBAR MOBILE CONTROLS
     // =============================================================
     function toggleSidebar() {
@@ -1314,62 +1329,20 @@
     }
 
     // =============================================================
-    // PLATFORM DOWNLOAD MODAL HANDLERS (WINDOWS vs ANDROID)
+    // UNIVERSAL FILE, PDF & IMAGE EXPORT FUNCTIONS
     // =============================================================
-    function openPlatformModal() {
-      const fb = document.getElementById('platformInstallFeedback');
-      if (fb) fb.style.display = 'none';
-      document.getElementById('platformModal').style.display = 'flex';
+    function downloadFile(filename, content, mimeType = 'text/plain;charset=utf-8') {
+      const blob = new Blob([content], { type: mimeType });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
     }
 
-    function closePlatformModal() {
-      document.getElementById('platformModal').style.display = 'none';
-    }
-
-    function selectPlatform(platform) {
-      const fb = document.getElementById('platformInstallFeedback');
-      fb.style.display = 'block';
-
-      if (platform === 'windows') {
-        if (deferredPrompt) {
-          deferredPrompt.prompt();
-          deferredPrompt.userChoice.then((choiceResult) => {
-            if (choiceResult.outcome === 'accepted') {
-              fb.innerHTML = `✅ <b>Windows Installation Started:</b> HealthLens AI is now installed to your Windows Desktop and Start Menu.`;
-            }
-            deferredPrompt = null;
-          });
-        } else {
-          fb.innerHTML = `
-            <b style="color: var(--primary);">🪟 Windows Installation Guide:</b><br>
-            1. In Chrome or Edge on your PC, click the <b>Install App icon (🖥️ or ➕)</b> in the address bar.<br>
-            2. Click <b>Install</b>. HealthLens AI will open in its own borderless window and place a shortcut on your Desktop & Start Menu.
-          `;
-        }
-      } else if (platform === 'android') {
-        if (deferredPrompt) {
-          deferredPrompt.prompt();
-          deferredPrompt.userChoice.then((choiceResult) => {
-            if (choiceResult.outcome === 'accepted') {
-              fb.innerHTML = `✅ <b>Android App Added:</b> HealthLens AI has been added to your app drawer and home screen.`;
-            }
-            deferredPrompt = null;
-          });
-        } else {
-          fb.innerHTML = `
-            <b style="color: #10b981;">🤖 Android Installation Guide:</b><br>
-            1. Open this website in Chrome on your Android phone or tablet.<br>
-            2. Tap the <b>three dots menu (⋮)</b> in the top-right corner.<br>
-            3. Tap <b>"Install app"</b> or <b>"Add to Home screen"</b>.<br>
-            4. Confirm by tapping <b>Install</b>. HealthLens AI will appear alongside your native Android apps.
-          `;
-        }
-      }
-    }
-
-    // =============================================================
-    // UNIVERSAL PDF EXPORT FUNCTION
-    // =============================================================
     async function exportElementAsPdf(elementId, baseFileName) {
       const el = document.getElementById(elementId);
       if (!el) {
@@ -1427,9 +1400,6 @@
       }
     }
 
-    // =============================================================
-    // UNIVERSAL IMAGE EXPORT FUNCTION (PNG / JPG)
-    // =============================================================
     async function exportElementAsImage(elementId, baseFileName, format = 'png') {
       const el = document.getElementById(elementId);
       if (!el) {
