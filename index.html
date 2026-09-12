@@ -28,7 +28,6 @@
       --sidebar-width: 275px;
     }
 
-    /* Incognito Stealth Theme */
     body.incognito-theme {
       background: radial-gradient(circle at top, #24123a 0%, #08040f 100%) !important;
       --sidebar-bg: #10081c;
@@ -66,7 +65,7 @@
       position: relative;
     }
 
-    /* Desktop Sidebar Default */
+    /* Desktop Sidebar */
     .sidebar {
       width: var(--sidebar-width);
       background: var(--sidebar-bg);
@@ -222,6 +221,29 @@
       font-size: 0.75rem;
     }
 
+    .sidebar-action-btn {
+      width: 34px;
+      height: 34px;
+      border-radius: 8px;
+      border: 1px solid var(--card-border);
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: all 0.2s ease;
+      flex-shrink: 0;
+    }
+
+    .sidebar-action-btn:hover {
+      background: rgba(239, 68, 68, 0.15);
+      border-color: var(--danger);
+      color: #fff;
+      transform: translateY(-1px);
+    }
+
     /* Main Workspace */
     .main-wrapper {
       flex: 1;
@@ -290,7 +312,6 @@
       flex: 1;
     }
 
-    /* Desktop Navigation Tabs */
     .tabs {
       display: flex;
       background: rgba(15, 23, 42, 0.6);
@@ -361,6 +382,12 @@
       outline: none;
     }
 
+    textarea.form-control {
+      resize: vertical !important;
+      min-height: 90px;
+      max-width: 100%;
+    }
+
     .form-control:disabled {
       opacity: 0.6;
       cursor: not-allowed;
@@ -391,6 +418,7 @@
       justify-content: center;
       gap: 0.5rem;
       transition: all 0.25s;
+      text-decoration: none;
     }
 
     .btn:hover {
@@ -424,26 +452,12 @@
       color: #fff;
       box-shadow: 0 4px 15px rgba(16, 185, 129, 0.35);
     }
-    .btn-create-acct:hover {
-      box-shadow: 0 6px 20px rgba(16, 185, 129, 0.5);
-    }
 
     .btn-stop {
       background: rgba(239, 68, 68, 0.2);
       border: 1px solid #ef4444;
       color: #ef4444;
       font-weight: 700;
-    }
-    .btn-stop:hover {
-      background: #ef4444;
-      color: #fff;
-    }
-
-    .export-group {
-      display: flex;
-      gap: 0.5rem;
-      align-items: center;
-      flex-wrap: wrap;
     }
 
     .dropzone {
@@ -483,32 +497,52 @@
       border: 1px solid var(--success);
     }
 
-    /* Platform Choice Cards */
-    .platform-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 1rem;
+    /* Custom Glassmorphic Switch */
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 44px;
+      height: 24px;
+      flex-shrink: 0;
     }
 
-    .platform-card {
-      background: rgba(15, 23, 42, 0.75);
-      border: 1px solid var(--card-border);
-      border-radius: 14px;
-      padding: 1.4rem 1rem;
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .switch .slider {
+      position: absolute;
       cursor: pointer;
-      transition: all 0.25s ease;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      text-align: center;
-      justify-content: space-between;
+      inset: 0;
+      background-color: rgba(255, 255, 255, 0.12);
+      border: 1px solid var(--card-border);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      border-radius: 24px;
     }
 
-    .platform-card:hover {
+    .switch .slider:before {
+      position: absolute;
+      content: "";
+      height: 16px;
+      width: 16px;
+      left: 3px;
+      bottom: 3px;
+      background-color: var(--text-muted);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      border-radius: 50%;
+    }
+
+    .switch input:checked + .slider {
+      background-color: rgba(56, 189, 248, 0.25);
       border-color: var(--primary);
-      background: rgba(56, 189, 248, 0.08);
-      transform: translateY(-3px);
-      box-shadow: 0 8px 25px var(--primary-glow);
+      box-shadow: 0 0 10px var(--primary-glow);
+    }
+
+    .switch input:checked + .slider:before {
+      transform: translateX(20px);
+      background-color: var(--primary);
     }
 
     /* Point-to-Pain Mannequin Map */
@@ -656,10 +690,7 @@
       color: var(--text);
     }
 
-    /* =========================================================
-       SPECIFIC MOBILE & ANDROID RESPONSIVE RULES (≤ 768px)
-       Desktop (>768px) is 100% unaffected
-       ========================================================= */
+    /* Mobile Responsive Rules (≤ 768px) */
     @media (max-width: 768px) {
       .sidebar {
         position: fixed !important;
@@ -687,7 +718,6 @@
         inset: 0 !important;
         background: rgba(0, 0, 0, 0.65) !important;
         backdrop-filter: blur(4px) !important;
-        -webkit-backdrop-filter: blur(4px) !important;
         z-index: 999 !important;
         display: none;
         opacity: 0;
@@ -697,6 +727,12 @@
       .sidebar-overlay.active {
         display: block !important;
         opacity: 1 !important;
+      }
+
+      /* Hide hamburger button when sidebar is active */
+      body:has(.sidebar.open) .header-left .btn-secondary[onclick*="toggleSidebar"] {
+        opacity: 0;
+        pointer-events: none;
       }
 
       .main-wrapper {
@@ -710,15 +746,10 @@
         gap: 0.35rem !important;
       }
 
-      .brand {
-        font-size: 1rem !important;
-      }
+      .brand { font-size: 1rem !important; }
+      #modelBadge { display: none !important; }
 
-      #modelBadge {
-        display: none !important;
-      }
-
-      #platformDownloadBtn {
+      #directDownloadBtn {
         padding: 0.35rem 0.55rem !important;
         font-size: 0.74rem !important;
       }
@@ -768,46 +799,14 @@
         grid-column: span 3 !important;
       }
 
-      .tab-icon {
-        font-size: 1.15rem !important;
-      }
-
-      .tab-label {
-        font-weight: 700 !important;
-      }
-
-      .card {
-        padding: 1.15rem 0.9rem !important;
-        border-radius: 14px !important;
-      }
-
-      .grid-2 {
-        grid-template-columns: 1fr !important;
-        gap: 0.75rem !important;
-      }
-
-      .dual-doctor-grid {
-        grid-template-columns: 1fr !important;
-      }
-
-      .platform-grid {
-        grid-template-columns: 1fr !important;
-        gap: 0.75rem !important;
-      }
-
-      .modal-box {
-        padding: 1.3rem 1rem !important;
-        width: 95% !important;
-      }
-
-      .chat-box {
-        height: 48vh !important;
-        padding: 0.75rem !important;
-      }
-
-      .msg {
-        max-width: 92% !important;
-      }
+      .tab-icon { font-size: 1.15rem !important; }
+      .tab-label { font-weight: 700 !important; }
+      .card { padding: 1.15rem 0.9rem !important; border-radius: 14px !important; }
+      .grid-2 { grid-template-columns: 1fr !important; gap: 0.75rem !important; }
+      .dual-doctor-grid { grid-template-columns: 1fr !important; }
+      .modal-box { padding: 1.3rem 1rem !important; width: 95% !important; }
+      .chat-box { height: 48vh !important; padding: 0.75rem !important; }
+      .msg { max-width: 92% !important; }
     }
   </style>
 </head>
@@ -836,16 +835,15 @@
       <div class="sidebar-footer">
         <div class="user-pill" onclick="openAuthModal(false)">
           <div class="user-avatar" id="userAvatar">?</div>
-          <div>
-            <div style="font-weight: 700;" id="userLabel">Guest Mode</div>
+          <div style="overflow: hidden; max-width: 140px;">
+            <div style="font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" id="userLabel">Guest Mode</div>
             <div style="font-size: 0.72rem; color: #64748b;" id="userSub">Sign in to sync</div>
           </div>
         </div>
-        <button id="authActionBtn" class="history-del-btn" style="opacity: 1;" onclick="handleAuthAction()" title="Sign In">🔑</button>
+        <button id="authActionBtn" class="sidebar-action-btn" onclick="handleAuthAction()" title="Sign In">🔑</button>
       </div>
     </aside>
 
-    <!-- Mobile Dimming Backdrop Overlay -->
     <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
 
     <!-- Main Workspace -->
@@ -859,10 +857,10 @@
         </div>
 
         <div class="header-right">
-          <!-- App Download Platform Selector Button -->
-          <button type="button" class="btn btn-secondary" id="platformDownloadBtn" onclick="openPlatformModal()" title="Download HealthLens AI">
+          <!-- Instant 1-Click App Download (Zero Guides / Zero Alerts) -->
+          <a href="/api/download/app" class="btn btn-secondary" id="directDownloadBtn" download title="Download HealthLens App Immediately">
             📱 Download App
-          </button>
+          </a>
 
           <!-- Create Account Button -->
           <button type="button" class="btn btn-create-acct" id="headerCreateAccountBtn" onclick="openAuthModal(true)">
@@ -928,7 +926,7 @@
               <div class="grid-2">
                 <div class="form-group">
                   <label>Age</label>
-                  <input type="number" id="symAge" class="form-control" placeholder="38" />
+                  <input type="number" id="symAge" class="form-control" min="0" max="125" placeholder="e.g. 35" value="" />
                 </div>
                 <div class="form-group">
                   <label>Sex</label>
@@ -940,12 +938,16 @@
                 </div>
               </div>
 
+              <!-- Glassmorphic Styled Dual-Doctor Switch -->
               <div style="margin: 0.5rem 0 1.2rem 0; padding: 0.75rem 1rem; background: rgba(255, 255, 255, 0.03); border: 1px solid var(--card-border); border-radius: 10px; display: flex; justify-content: space-between; align-items: center;">
                 <div>
                   <b style="font-size: 0.88rem; color: var(--text);">🩺 Dual-Doctor Second Opinion Simulation</b>
                   <p style="font-size: 0.76rem; color: var(--text-muted);">Pits Dr. Alpha (Conservative Internist) vs Dr. Beta (Emergency Specialist).</p>
                 </div>
-                <input type="checkbox" id="dualDoctorToggle" style="width: 20px; height: 20px; cursor: pointer;" />
+                <label class="switch" title="Toggle Second Opinion">
+                  <input type="checkbox" id="dualDoctorToggle" />
+                  <span class="slider"></span>
+                </label>
               </div>
 
               <button type="submit" id="symBtn" class="btn" style="width: 100%;">Run Comprehensive Assessment</button>
@@ -1045,7 +1047,7 @@
           <div class="card">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem; flex-wrap: wrap; gap: 0.5rem;">
               <h2 style="font-size: 1.2rem;">HealthLens AI Clinical Assistant</h2>
-              <div class="export-group">
+              <div style="display: flex; gap: 0.5rem;">
                 <button type="button" class="btn btn-secondary" onclick="exportElementAsPdf('chatBox', 'clinical_chat_transcript')" style="padding: 0.45rem 0.75rem; font-size: 0.8rem;" title="Download as PDF">
                   📄 PDF
                 </button>
@@ -1072,42 +1074,6 @@
           </div>
         </section>
       </main>
-    </div>
-  </div>
-
-  <!-- Modal: Direct 1-Click Platform Download (Zero Guides) -->
-  <div class="modal-backdrop" id="platformModal">
-    <div class="modal-box" style="max-width: 440px; text-align: center;">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.2rem;">
-        <h3 style="color: var(--primary); font-size: 1.2rem;">Download App</h3>
-        <button type="button" class="btn btn-secondary" onclick="closePlatformModal()" style="padding: 2px 8px;">✕</button>
-      </div>
-
-      <div class="platform-grid">
-        <!-- Windows 1-Click Download -->
-        <div class="platform-card" onclick="triggerWindowsDownload()">
-          <div style="font-size: 2.8rem; margin-bottom: 0.4rem;">🪟</div>
-          <b style="font-size: 1rem; color: #fff;">Windows PC</b>
-          <p style="font-size: 0.76rem; color: var(--text-muted); margin: 0.3rem 0 0.8rem 0;">
-            Standalone Desktop App (.bat)
-          </p>
-          <button type="button" class="btn" style="width: 100%; font-size: 0.82rem; padding: 0.5rem 0.6rem;">
-            ⬇️ Download Windows App
-          </button>
-        </div>
-
-        <!-- Android 1-Click Download -->
-        <div class="platform-card" onclick="triggerAndroidDownload()">
-          <div style="font-size: 2.8rem; margin-bottom: 0.4rem;">🤖</div>
-          <b style="font-size: 1rem; color: #fff;">Android</b>
-          <p style="font-size: 0.76rem; color: var(--text-muted); margin: 0.3rem 0 0.8rem 0;">
-            Mobile App (.apk / 1-Tap)
-          </p>
-          <button type="button" class="btn" style="width: 100%; font-size: 0.82rem; padding: 0.5rem 0.6rem;">
-            ⬇️ Download Android App
-          </button>
-        </div>
-      </div>
     </div>
   </div>
 
@@ -1240,7 +1206,6 @@
     let isSignUp = false;
     let chatAbortController = null;
     let currentHandoverData = null;
-    let deferredPrompt = null;
 
     // Body Map State
     let selectedZone = null;
@@ -1255,51 +1220,11 @@
       updateUserUI();
       loadHistory();
       initBodyMapInteractions();
-    });
 
-    // PWA Install prompt interceptor
-    window.addEventListener('beforeinstallprompt', (e) => {
-      e.preventDefault();
-      deferredPrompt = e;
-    });
-
-    // =============================================================
-    // DIRECT 1-CLICK PLATFORM DOWNLOADS (NO GUIDES)
-    // =============================================================
-    function openPlatformModal() {
-      document.getElementById('platformModal').style.display = 'flex';
-    }
-
-    function closePlatformModal() {
-      document.getElementById('platformModal').style.display = 'none';
-    }
-
-    function triggerWindowsDownload() {
-      closePlatformModal();
-      const host = window.location.origin;
-      const batScript = `@echo off\r\n:: HealthLens AI Desktop Window Launcher\r\necho Launching HealthLens AI...\r\nstart msedge --app="${host}" 2>nul || start chrome --app="${host}" 2>nul || start "" "${host}"\r\nexit\r\n`;
-      downloadFile('HealthLens-AI-Windows.bat', batScript, 'application/x-bat');
-    }
-
-    function triggerAndroidDownload() {
-      closePlatformModal();
-      // If browser PWA install is ready, trigger native 1-tap installation dialog immediately
-      if (deferredPrompt) {
-        deferredPrompt.prompt();
-        deferredPrompt.userChoice.then(() => {
-          deferredPrompt = null;
-        });
-        return;
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('/sw.js').catch(err => console.log('SW registration:', err));
       }
-      
-      // Otherwise immediately initiate file download of the APK
-      const a = document.createElement('a');
-      a.href = '/api/download/android';
-      a.download = 'HealthLens-AI.apk';
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-    }
+    });
 
     // =============================================================
     // RESPONSIVE SIDEBAR MOBILE CONTROLS
@@ -1309,13 +1234,7 @@
       const ov = document.getElementById('sidebarOverlay');
       if (sb) {
         sb.classList.toggle('open');
-        if (ov) {
-          if (sb.classList.contains('open')) {
-            ov.classList.add('active');
-          } else {
-            ov.classList.remove('active');
-          }
-        }
+        if (ov) ov.classList.toggle('active', sb.classList.contains('open'));
       }
     }
 
@@ -1329,26 +1248,11 @@
     }
 
     // =============================================================
-    // UNIVERSAL FILE, PDF & IMAGE EXPORT FUNCTIONS
+    // UNIVERSAL PDF & IMAGE EXPORT ENGINES
     // =============================================================
-    function downloadFile(filename, content, mimeType = 'text/plain;charset=utf-8') {
-      const blob = new Blob([content], { type: mimeType });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = filename;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-    }
-
     async function exportElementAsPdf(elementId, baseFileName) {
       const el = document.getElementById(elementId);
-      if (!el) {
-        alert("No content available to export as PDF.");
-        return;
-      }
+      if (!el) return alert("No content available to export as PDF.");
 
       const origScroll = el.scrollTop;
       const origHeight = el.style.height;
@@ -1390,7 +1294,6 @@
 
         pdf.save(`${baseFileName}_${Date.now()}.pdf`);
       } catch (err) {
-        console.error("PDF Export Error:", err);
         alert("PDF Generation Failed: " + err.message);
       } finally {
         el.style.height = origHeight;
@@ -1402,10 +1305,7 @@
 
     async function exportElementAsImage(elementId, baseFileName, format = 'png') {
       const el = document.getElementById(elementId);
-      if (!el) {
-        alert("No content available to export as image.");
-        return;
-      }
+      if (!el) return alert("No content available to export as image.");
 
       const origScroll = el.scrollTop;
       const origHeight = el.style.height;
@@ -1434,7 +1334,6 @@
         link.click();
         document.body.removeChild(link);
       } catch (err) {
-        console.error("Image Export Error:", err);
         alert("Image Generation Failed: " + err.message);
       } finally {
         el.style.height = origHeight;
@@ -1556,8 +1455,6 @@
       closeSidebarMobile();
     }
 
-    const restoreSession = openSession;
-
     function restoreSessionData(session) {
       const type = session.type;
       const tabName = type === 'scans' ? 'scans' : type === 'rx' ? 'rx' : type === 'audio' ? 'audio' : type === 'chat' ? 'chat' : 'symptoms';
@@ -1619,6 +1516,7 @@
         const existing = guests.find(x => x.id === id);
         if (existing) {
           existing.title = title;
+          existing.type = type;
           existing.data = data;
         } else {
           guests.unshift({ id, title, type, data, created_at: 'Just now' });
@@ -2285,12 +2183,14 @@
         label.innerText = currentUser.email.split('@')[0];
         sub.innerText = "Synced Account";
         btn.innerText = "🚪";
+        btn.title = "Sign Out";
         if (createAcctBtn) createAcctBtn.style.display = 'none';
       } else {
         avatar.innerText = "?";
         label.innerText = "Guest Mode";
         sub.innerText = "Click to Sign In";
         btn.innerText = "🔑";
+        btn.title = "Sign In";
         if (createAcctBtn) createAcctBtn.style.display = 'inline-flex';
       }
     }
