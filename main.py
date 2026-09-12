@@ -7,9 +7,11 @@
 # pyright: reportGeneralTypeIssues=none
 # pyright: reportArgumentType=none
 # pyright: reportUnusedImport=none
+# pyright: reportUnusedVariable=none
 
 import asyncio
 import hashlib
+import html
 import io
 import json
 import os
@@ -28,11 +30,11 @@ from google.genai import types
 import numpy as np
 from PIL import Image
 import pydicom
-from pydantic import BaseModel
+from pydantic import BaseModel, Field, field_validator
 
 load_dotenv()
 
-app = FastAPI(title="HealthLens AI Clinical Suite", version="7.0.0")
+app = FastAPI(title="HealthLens AI Clinical Suite", version="8.1.0")
 
 app.add_middleware(
     CORSMiddleware,
@@ -43,18 +45,32 @@ app.add_middleware(
 )
 
 # -------------------------------------------------------------
+# Security & Privacy Headers Middleware
+# -------------------------------------------------------------
+@app.middleware("http")
+async def security_and_privacy_headers(request: Request, call_next):
+    response: Response = await call_next(request)
+    response.headers["X-Frame-Options"] = "DENY"
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["X-XSS-Protection"] = "1; mode=block"
+    if request.url.path.startswith("/api/"):
+        response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, private"
+        response.headers["Pragma"] = "no-cache"
+    return response
+
+# -------------------------------------------------------------
 # Global Exception Handler
 # -------------------------------------------------------------
 @app.exception_handler(Exception)
 async def global_exception_handler(request: Request, exc: Exception) -> JSONResponse:
-    print(f"[🔥 UNHANDLED BACKEND ERROR] {str(exc)}")
+    print(f"[🔥 UNHANDLED ERROR] {str(exc)}")
     return JSONResponse(
         status_code=500,
-        content={"status": "error", "detail": f"Internal Diagnostic Server Error: {str(exc)}"}
+        content={"status": "error", "detail": f"Internal Server Error: {str(exc)}"}
     )
 
 # -------------------------------------------------------------
-# Static PWA Delivery Endpoints
+# Static Delivery & App Assets
 # -------------------------------------------------------------
 @app.get("/")
 def serve_index() -> FileResponse:
@@ -63,20 +79,47 @@ def serve_index() -> FileResponse:
     raise HTTPException(status_code=404, detail="index.html not found.")
 
 @app.get("/manifest.json")
-def serve_manifest() -> FileResponse:
-    if os.path.exists("manifest.json"):
-        return FileResponse("manifest.json", media_type="application/manifest+json")
-    raise HTTPException(status_code=404, detail="manifest.json not found.")
+def serve_manifest(request: Request) -> JSONResponse:
+    manifest_data = {
+        "name": "HealthLens AI - Clinical Suite",
+        "short_name": "HealthLens",
+        "description": "AI-Powered Clinical Diagnostics and Radiography Suite",
+        "start_url": "/",
+        "display": "standalone",
+        "background_color": "#090d16",
+        "theme_color": "#0284c7",
+        "orientation": "portrait-primary",
+        "icons": [
+            {
+                "src": "/icon-192.png",
+                "sizes": "192x192",
+                "type": "image/png",
+                "purpose": "any maskable"
+            },
+            {
+                "src": "/icon-512.png",
+                "sizes": "512x512",
+                "type": "image/png",
+                "purpose": "any maskable"
+            }
+        ]
+    }
+    return JSONResponse(content=manifest_data, media_type="application/manifest+json")
 
 @app.get("/sw.js")
-def serve_sw() -> FileResponse:
-    if os.path.exists("sw.js"):
-        return FileResponse(
-            "sw.js",
-            media_type="application/javascript",
-            headers={"Cache-Control": "no-cache, no-store, must-revalidate"}
-        )
-    raise HTTPException(status_code=404, detail="sw.js not found.")
+def serve_sw() -> Response:
+    sw_code = """
+    self.addEventListener('install', (e) => self.skipWaiting());
+    self.addEventListener('activate', (e) => e.waitUntil(self.clients.claim()));
+    self.addEventListener('fetch', (e) => {
+      e.respondWith(fetch(e.request).catch(() => caches.match(e.request)));
+    });
+    """
+    return Response(
+        content=sw_code,
+        media_type="application/javascript",
+        headers={"Cache-Control": "no-cache, no-store, must-revalidate"}
+    )
 
 @app.get("/icon.png")
 def serve_icon() -> Response:
@@ -93,11 +136,72 @@ def serve_icon_192() -> Response:
         return FileResponse("icon-192.png", media_type="image/png")
     return serve_icon()
 
+@app.get("/icon-512.png")
+def serve_icon_512() -> Response:
+    if os.path.exists("icon-512.png"):
+        return FileResponse("icon-512.png", media_type="image/png")
+    return serve_icon()
+
 @app.get("/doctor.png")
 def serve_doctor() -> Response:
     if os.path.exists("doctor.png"):
         return FileResponse("doctor.png", media_type="image/png")
     return serve_icon()
+
+# -------------------------------------------------------------
+# Instant 1-Click App Download Endpoints (Zero Warnings / Errors)
+# -------------------------------------------------------------
+def _generate_launcher_html(base_url: str, title: str) -> str:
+    return f"""<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{title}</title>
+    <meta http-equiv="refresh" content="0; url={base_url}">
+    <script>window.location.replace("{base_url}");</script>
+</head>
+<body style="background:#090d16;color:#38bdf8;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif;display:flex;align-items:center;justify-content:center;height:100vh;margin:0;">
+    <div style="text-align:center;">
+        <h2 style="margin-bottom:8px;">Launching {title}...</h2>
+        <p style="color:#94a3b8;font-size:14px;">Connecting to diagnostic suite...</p>
+    </div>
+</body>
+</html>"""
+
+@app.get("/api/download/app")
+def download_auto_detected_app(request: Request) -> Response:
+    base_url = str(request.base_url).rstrip("/")
+    user_agent = request.headers.get("user-agent", "").lower()
+    is_mobile = "android" in user_agent or "mobile" in user_agent
+    filename = "HealthLens-AI-Android.html" if is_mobile else "HealthLens-AI-Windows.html"
+    title = "HealthLens AI Mobile" if is_mobile else "HealthLens AI Desktop"
+    content = _generate_launcher_html(base_url, title)
+    return Response(
+        content=content,
+        media_type="text/html",
+        headers={"Content-Disposition": f"attachment; filename={filename}"}
+    )
+
+@app.get("/api/download/windows")
+def download_windows_app(request: Request) -> Response:
+    base_url = str(request.base_url).rstrip("/")
+    content = _generate_launcher_html(base_url, "HealthLens AI Desktop")
+    return Response(
+        content=content,
+        media_type="text/html",
+        headers={"Content-Disposition": "attachment; filename=HealthLens-AI-Windows.html"}
+    )
+
+@app.get("/api/download/android")
+def download_android_app(request: Request) -> Response:
+    base_url = str(request.base_url).rstrip("/")
+    content = _generate_launcher_html(base_url, "HealthLens AI Mobile")
+    return Response(
+        content=content,
+        media_type="text/html",
+        headers={"Content-Disposition": "attachment; filename=HealthLens-AI-Android.html"}
+    )
 
 # -------------------------------------------------------------
 # User Storage & History System
@@ -122,25 +226,23 @@ def hash_pw(pw: str) -> str:
     return hashlib.sha256(pw.encode("utf-8")).hexdigest()
 
 class AuthReq(BaseModel):
-    email: str
-    password: str
+    email: str = Field(..., min_length=5, max_length=100)
+    password: str = Field(..., min_length=6, max_length=100)
 
 @app.post("/api/auth/signup")
 def signup(creds: AuthReq) -> Dict[str, str]:
     email = creds.email.strip().lower()
     if not re.match(r"^[^@]+@[^@]+\.[^@]+$", email):
-        raise HTTPException(status_code=400, detail="Invalid email address.")
-    if len(creds.password) < 6:
-        raise HTTPException(status_code=400, detail="Password must be at least 6 characters.")
+        raise HTTPException(status_code=400, detail="Invalid email address format.")
     users = load_users()
     if email in users:
-        raise HTTPException(status_code=400, detail="Email already registered.")
+        raise HTTPException(status_code=400, detail="Email is already registered.")
     users[email] = {
         "password_hash": hash_pw(creds.password),
         "sessions": []
     }
     save_users(users)
-    return {"status": "success", "message": "Registered successfully.", "email": email}
+    return {"status": "success", "message": "Account created successfully.", "email": email}
 
 @app.post("/api/auth/login")
 def login(creds: AuthReq) -> Dict[str, str]:
@@ -154,7 +256,7 @@ class SaveSessionReq(BaseModel):
     email: str
     id: Optional[str] = None
     title: str
-    type: str  # "symptoms" | "scans" | "rx" | "audio" | "chat"
+    type: str
     data: Any
 
 @app.get("/api/history")
@@ -181,7 +283,7 @@ def get_session(session_id: str, email: str = Query(...)) -> Dict[str, Any]:
     email_clean = email.strip().lower()
     users = load_users()
     if email_clean not in users:
-        raise HTTPException(status_code=404, detail="User not found.")
+        raise HTTPException(status_code=404, detail="User account not found.")
     for s in users[email_clean].get("sessions", []):
         if s["id"] == session_id:
             return {"status": "success", "session": s}
@@ -258,15 +360,7 @@ def health() -> Dict[str, Any]:
         "status": "ok",
         "app": "HealthLens AI Clinical Suite",
         "model": TARGET_MODEL,
-        "total_active_keys": len(CLIENT_POOL),
-        "features": [
-            "Point-to-Pain Body Dialog",
-            "Dual-Doctor Second Opinion",
-            "Rx & Lab OCR Decoder",
-            "Acoustic Cough Analyzer",
-            "PACS Slice Scrubber",
-            "Paramedic Handover EMT Mode"
-        ]
+        "total_active_keys": len(CLIENT_POOL)
     }
 
 # -------------------------------------------------------------
@@ -274,7 +368,7 @@ def health() -> Dict[str, Any]:
 # -------------------------------------------------------------
 def extract_clean_json(text: str) -> Dict[str, Any]:
     if not text or not text.strip():
-        raise ValueError("Diagnostic model returned empty text.")
+        raise ValueError("Diagnostic model returned an empty response.")
     raw = text.strip()
     raw = re.sub(r"^```(?:json)?\s*", "", raw, flags=re.IGNORECASE)
     raw = re.sub(r"\s*```$", "", raw)
@@ -343,8 +437,7 @@ async def race_sampled_keys(call_fn: Callable[..., Dict[str, Any]], *args: Any) 
 
     for coro in asyncio.as_completed(tasks):
         try:
-            result, winning_idx = await coro
-            print(f"[⚡] Key #{winning_idx + 1} delivered verified clinical response!")
+            result, _ = await coro
             for t in tasks:
                 if not t.done():
                     t.cancel()
@@ -352,7 +445,6 @@ async def race_sampled_keys(call_fn: Callable[..., Dict[str, Any]], *args: Any) 
         except asyncio.CancelledError:
             continue
         except Exception as e:
-            print(f"[!] Sub-task failed: {e}")
             errors.append(str(e))
             continue
 
@@ -365,16 +457,36 @@ async def race_sampled_keys(call_fn: Callable[..., Dict[str, Any]], *args: Any) 
 # 1. Symptoms Assessment with Point-to-Pain & Dual-Doctor
 # -------------------------------------------------------------
 class SymptomPayload(BaseModel):
-    symptoms: str
-    patient_age: Optional[str] = None
-    patient_sex: Optional[str] = None
-    duration: Optional[str] = None
-    known_conditions: Optional[str] = None
-    body_regions: Optional[List[str]] = None
-    pain_severity: Optional[int] = None
-    pain_character: Optional[str] = None
-    radiation: Optional[str] = None
+    symptoms: str = Field(..., min_length=3, max_length=2000)
+    patient_age: Optional[str] = Field(None, max_length=3)
+    patient_sex: Optional[str] = Field(None, max_length=20)
+    duration: Optional[str] = Field(None, max_length=100)
+    known_conditions: Optional[str] = Field(None, max_length=500)
+    body_regions: Optional[List[str]] = Field(None, max_length=10)
+    pain_severity: Optional[int] = Field(None, ge=1, le=10)
+    pain_character: Optional[str] = Field(None, max_length=50)
+    radiation: Optional[str] = Field(None, max_length=100)
     dual_doctor_mode: Optional[bool] = False
+
+    @field_validator("symptoms", "known_conditions", "radiation")
+    @classmethod
+    def sanitize_strings(cls, v: Optional[str]) -> Optional[str]:
+        if v:
+            clean = html.escape(v.strip())
+            lowered = clean.lower()
+            for pattern in [r"ignore\s+(all\s+)?previous", r"system\s*:", r"override\s+your\s+rules"]:
+                if re.search(pattern, lowered):
+                    raise ValueError("Invalid symptom description syntax.")
+            return clean
+        return v
+
+    @field_validator("patient_age")
+    @classmethod
+    def validate_age(cls, v: Optional[str]) -> Optional[str]:
+        if v and v.strip():
+            if not v.strip().isdigit() or not (0 <= int(v.strip()) <= 125):
+                raise ValueError("Age must be between 0 and 125.")
+        return v
 
 def _execute_symptom_call(client_idx: int, prompt: str, sys_instruction: str) -> Dict[str, Any]:
     client = CLIENT_POOL[client_idx]
@@ -393,9 +505,6 @@ def _execute_symptom_call(client_idx: int, prompt: str, sys_instruction: str) ->
 
 @app.post("/api/symptoms/analyze")
 async def analyze_symptoms(payload: SymptomPayload) -> Dict[str, Any]:
-    if not payload.symptoms.strip() and not payload.body_regions:
-        raise HTTPException(status_code=400, detail="Symptoms or pain map localization required.")
-
     sys_instruction = """
     You are an emergency triage physician and differential diagnostics AI.
     Analyze patient symptoms, localized body pain regions, pain character, and severity.
@@ -446,11 +555,13 @@ async def analyze_symptoms(payload: SymptomPayload) -> Dict[str, Any]:
         body_context += f"\nRadiation: {payload.radiation}"
 
     prompt = (
-        f"Patient Complaints: {payload.symptoms}\n"
+        f"<patient_record>\n"
+        f"Complaints: {payload.symptoms}\n"
         f"Age: {payload.patient_age or 'Unspecified'}, Sex: {payload.patient_sex or 'Unspecified'}, "
         f"Duration: {payload.duration or 'Unspecified'}, History: {payload.known_conditions or 'None'}"
         f"{body_context}\n"
-        f"Dual-Doctor Simulation Requested: {'YES' if payload.dual_doctor_mode else 'NO'}"
+        f"Dual-Doctor Simulation Requested: {'YES' if payload.dual_doctor_mode else 'NO'}\n"
+        f"</patient_record>"
     )
 
     data = await race_sampled_keys(_execute_symptom_call, prompt, sys_instruction)
@@ -561,12 +672,8 @@ async def analyze_audio(file: UploadFile = File(...)) -> Dict[str, Any]:
       "audible_wheeze": boolean,
       "audible_stridor": boolean,
       "severity_grade": "Mild | Moderate | Urgent | Severe",
-      "acoustic_biomarkers": [
-        "string"
-      ],
-      "differential_pulmonary_causes": [
-        "string"
-      ],
+      "acoustic_biomarkers": ["string"],
+      "differential_pulmonary_causes": ["string"],
       "home_care_and_action": "string",
       "red_flag_triggers": ["string"]
     }
@@ -634,7 +741,9 @@ async def analyze_scan(
       "disclaimer": "AI review only. Must be confirmed by a board-certified radiologist."
     }
     """
-    prompt = f"Analyze these {len(parts)} scan images. Region: {confirmed_body_part or 'Auto-detect'}, Symptoms: {symptoms or 'None stated'}."
+    clean_region = html.escape((confirmed_body_part or "Auto-detect").strip())
+    clean_symptoms = html.escape((symptoms or "None stated").strip())
+    prompt = f"Analyze these {len(parts)} scan images. Region: {clean_region}, Symptoms: {clean_symptoms}."
     contents: List[Any] = [*parts, prompt]
 
     data = await race_sampled_keys(_execute_scan_call, contents, sys_instruction)
@@ -649,7 +758,7 @@ class ChatPayload(BaseModel):
 @app.post("/api/chat/stream")
 async def chat_stream(payload: ChatPayload) -> StreamingResponse:
     if not payload.messages:
-        raise HTTPException(status_code=400, detail="Empty messages.")
+        raise HTTPException(status_code=400, detail="Empty messages payload.")
 
     history: List[types.ContentOrDict] = [
         types.Content(
@@ -694,7 +803,6 @@ async def chat_stream(payload: ChatPayload) -> StreamingResponse:
                                 return
                             stop_event.set()
                             is_winner = True
-                            print(f"[⚡] Key #{client_idx + 1} won the chat streaming race!")
                         asyncio.run_coroutine_threadsafe(queue.put({"text": chunk.text}), loop)
 
                 if is_winner:
@@ -738,37 +846,7 @@ async def chat_stream(payload: ChatPayload) -> StreamingResponse:
             "X-Accel-Buffering": "no"
         }
     )
-# -------------------------------------------------------------
-# Direct Application Package Download Endpoints
-# -------------------------------------------------------------
-@app.get("/api/download/windows")
-def download_windows_launcher(request: Request) -> Response:
-    host = str(request.base_url).rstrip("/")
-    content = f"""@echo off
-:: HealthLens AI Standalone Desktop Window Launcher
-echo Launching HealthLens AI...
-start msedge --app="{host}" 2>nul || start chrome --app="{host}" 2>nul || start "" "{host}"
-exit
-"""
-    return Response(
-        content=content,
-        media_type="application/x-bat",
-        headers={"Content-Disposition": "attachment; filename=HealthLens-AI-Windows.bat"}
-    )
 
-@app.get("/api/download/android")
-def download_android_package() -> Response:
-    apk_path = "HealthLens-AI.apk"
-    if os.path.exists(apk_path):
-        return FileResponse(apk_path, media_type="application/vnd.android.package-archive", filename="HealthLens-AI.apk")
-    
-    # Lightweight WebAPK installation package
-    pkg_content = b'PK\x03\x04\x14\x00\x08\x00\x08\x00HealthLensAI-Android-Package'
-    return Response(
-        content=pkg_content,
-        media_type="application/vnd.android.package-archive",
-        headers={"Content-Disposition": "attachment; filename=HealthLens-AI.apk"}
-    )
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host=os.getenv("HOST", "0.0.0.0"), port=int(os.getenv("PORT", "8000")))
